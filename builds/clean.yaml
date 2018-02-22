@@ -1,0 +1,12 @@
+queue:
+  name: Hosted VS2017
+  demands: azureps
+
+steps:
+- task: AzurePowerShell@2
+  inputs:
+    azureConnectionType: 'ConnectedServiceNameARM'
+    azureSubscription: 'Azure Connection'
+    ScriptPath: 'Clean.ps1'
+    ScriptArguments: '-RemovePackerResourceGroups:$(RemovePackerResourceGroups) -RemoveManagedImages:$(RemoveManagedImages) -RemoveAgentPoolResourceGroup:$(RemoveAgentPoolResourceGroup) -ManagedImageName "$(ManagedImageName)" -ManagedImageResourceGroupName "$(ManagedImageResourceGroupName)" -AgentPoolResourceGroup "$(AgentPoolResourceGroup)"'
+    azurePowerShellVersion: 'LatestVersion'
