@@ -30,7 +30,9 @@ if ($InstallPrerequisites) {
     Install-Module AzureRM -AllowClobber -Force
     Import-Module AzureRM
 }
-
+$password=Convertto-SecureString $ClientSecret -AsPlainText -Force
+$cred=New-Object PSCredential -ArgumentList $ClientId, $password
+Login-AzureRmAccount  -Credential $cred -ServicePrincipal -TenantId $TenantId
 Get-AzureRmResourceGroup -Name $ManagedImageResourceGroupName -ErrorVariable notPresent -ErrorAction SilentlyContinue
 if ( -Not $notPresent) {
     "Cleaning up previous image versions"
