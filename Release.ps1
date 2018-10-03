@@ -13,7 +13,7 @@ Param(
     #if not specified otherwise - PIP is deployed at destroyable RG; otherwise it could be located at other RG, guaranteeing that it is left after reprovisioning
     [string]$pipRg,
     [int]$vmssCapacity = 1,
-    [string]$vmssSkuName = "Standard_DS4_v3"
+    [string]$vmssSkuName = "Standard_D4s_v3"
 )
 
 #Construct resources names
@@ -21,7 +21,7 @@ $AgentPoolResourceGroup = $resourcesBaseName + "-rg";
 $subnetName = $resourcesBaseName + "-subnet";
 $vnetName = $resourcesBaseName + "-vnet";
 $pipName = $resourcesBaseName + "-pip";
-if ([string]::IsNullOrWhiteSpace($pipRg) {
+if ([string]::IsNullOrWhiteSpace($pipRg)) {
     #public IP resource group have not been specified -> deploying in renewable one
     $pipRg = $AgentPoolResourceGroup;
 }
@@ -56,13 +56,17 @@ $vnet = New-AzureRmVirtualNetwork `
     -Subnet $subnet `
     -Force
 
-"Create a public IP address"
-$publicIP = New-AzureRmPublicIpAddress `
-    -ResourceGroupName $pipRg `
-    -Location $Location `
-    -AllocationMethod Static `
-    -Name $pipName `
-    -Force
+
+Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName -$pipRg -ev pipNotPresent -ea 0
+if ($pipNotPresent){
+    "Create a public IP address"
+    $publicIP = New-AzureRmPublicIpAddress `
+        -ResourceGroupName $pipRg `
+        -Location $Location `
+        -AllocationMethod Static `
+        -Name $pipName `
+        -Force
+}
 
 "Create a frontend and backend IP pool"
 $frontendIP = New-AzureRmLoadBalancerFrontendIpConfig `
