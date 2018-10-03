@@ -5,11 +5,29 @@ Param(
     [string]$VMName = $env:VMName,
     [string]$ManagedImageResourceGroupName = $env:ManagedImageResourceGroupName,
     [string]$ManagedImageName = $env:ManagedImageName,
-    [string]$AgentPoolResourceGroup = $env:AgentPoolResourceGroup,
-    [string]$Location = $env:Location,
+    [string]$Location = "West Europe",
+    #used to construc other resources names
+    [string]$resourcesBaseName,
     [string]$VSTSToken = $env:VSTSToken,
-    [string]$VSTSUrl = $env:VSTSUrl
+    [string]$VSTSUrl = $env:VSTSUrl,
+    #if not specified otherwise - PIP is deployed at destroyable RG; otherwise it could be located at other RG, guaranteeing that it is left after reprovisioning
+    [string]$pipRg,
+    [int]$vmssCapacity = 1,
+    [string]$vmssSkuName = "Standard_DS4_v3"
 )
+
+#Construct resources names
+$AgentPoolResourceGroup = $resourcesBaseName + "-rg";
+$subnetName = $resourcesBaseName + "-subnet";
+$vnetName = $resourcesBaseName + "-vnet";
+$pipName = $resourcesBaseName + "-pip";
+if ([string]::IsNullOrWhiteSpace($pipRg) {
+    #public IP resource group have not been specified -> deploying in renewable one
+    $pipRg = $AgentPoolResourceGroup;
+}
+$lbName = $resourcesBaseName + "-lb";
+$vmssScaleSetName = $resourcesBaseName + "-vmss";
+
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -18,7 +36,7 @@ Get-AzureRmResourceGroup -Name $AgentPoolResourceGroup -ev notPresent -ea 0
 
 if (-Not $notPresent) {
     "Removing $AgentPoolResourceGroup"
-    Remove-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Force 
+    Remove-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Force
 }
 
 "Creating new resource group $AgentPoolResourceGroup"
@@ -26,13 +44,13 @@ New-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Location $Location
 
 "Create a virtual network subnet"
 $subnet = New-AzureRmVirtualNetworkSubnetConfig `
-    -Name "Subnet" `
+    -Name $subnetName `
     -AddressPrefix 10.0.0.0/24
 
 "Create a virtual network"
 $vnet = New-AzureRmVirtualNetwork `
     -ResourceGroupName $AgentPoolResourceGroup `
-    -Name "Vnet" `
+    -Name $vnetName `
     -Location $Location `
     -AddressPrefix 10.0.0.0/16 `
     -Subnet $subnet `
@@ -40,10 +58,10 @@ $vnet = New-AzureRmVirtualNetwork `
 
 "Create a public IP address"
 $publicIP = New-AzureRmPublicIpAddress `
-    -ResourceGroupName $AgentPoolResourceGroup `
+    -ResourceGroupName $pipRg `
     -Location $Location `
     -AllocationMethod Static `
-    -Name "PublicIP" `
+    -Name $pipName `
     -Force
 
 "Create a frontend and backend IP pool"
@@ -65,7 +83,7 @@ $inboundNATPool = New-AzureRmLoadBalancerInboundNatPoolConfig `
 "Create the load balancer"
 $lb = New-AzureRmLoadBalancer `
     -ResourceGroupName $AgentPoolResourceGroup `
-    -Name "LoadBalancer" `
+    -Name $lbName `
     -Location $Location `
     -FrontendIpConfiguration $frontendIP `
     -BackendAddressPool $backendPool `
@@ -103,15 +121,15 @@ $ipConfig = New-AzureRmVmssIpConfig `
 "Create a config object"
 $vmssConfig = New-AzureRmVmssConfig `
     -Location $Location `
-    -SkuCapacity 1 `
-    -SkuName "Standard_DS4_v3" `
+    -SkuCapacity $vmssCapacity `
+    -SkuName $vmssSkuName `
     -UpgradePolicyMode Automatic
 
 "Set the image created by Packer"
 $image = Get-AzureRMImage -ImageName $ManagedImageName -ResourceGroupName $ManagedImageResourceGroupName
 Set-AzureRmVmssStorageProfile $vmssConfig `
     -OsDiskCreateOption FromImage `
-    -ManagedDisk StandardLRS `
+    -ManagedDisk PremiumLRS `
     -OsDiskCaching "None" `
     -OsDiskOsType Windows `
     -ImageReferenceId $image.id
@@ -132,16 +150,16 @@ Add-AzureRmVmssNetworkInterfaceConfiguration `
 "Create the scale set with the config object (this step might take a few minutes)"
 New-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
-    -Name "ScaleSet" `
+    -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmssConfig
 
 "Deploying Agent script to VM"
 
 $StorageAccountName = "scriptstorage"
 $ContainerName = "scripts"
-    
+
 $StorageAccountAvailability = Get-AzureRmStorageAccountNameAvailability -Name $StorageAccountName
-    
+
 if ($StorageAccountAvailability.NameAvailable) {
     "Creating storage account $StorageAccountName in $AgentPoolResourceGroup"
     New-AzureRmStorageAccount -ResourceGroupName $AgentPoolResourceGroup -AccountName $StorageAccountName -Location $Location -SkuName "Standard_LRS"
@@ -149,10 +167,10 @@ if ($StorageAccountAvailability.NameAvailable) {
 else {
     "Storage account $StorageAccountName in $AgentPoolResourceGroup already exists"
 }
-    
+
 $StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $AgentPoolResourceGroup -Name $StorageAccountName).Value[0]
 $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
-    
+
 $container = Get-AzureStorageContainer -Context $StorageContext |  where-object {$_.Name -eq "scripts"}
 if ( -Not $container) {
     "Creating container $ContainerName in $StorageAccountName"
@@ -161,14 +179,14 @@ if ( -Not $container) {
 else {
     "Container $ContainerName in $StorageAccountName already exists"
 }
-    
+
 $FileName = "AddAgentToVM.ps1";
 $basePath = $PWD;
 if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
     $basePath = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY/VSTSHostedAgentPool"
 }
 $LocalFile = "$basePath/scripts\$FileName"
-    
+
 "Uploading file $LocalFile to $StorageAccountName"
 Set-AzureStorageBlobContent `
     -Container $ContainerName `
@@ -176,7 +194,7 @@ Set-AzureStorageBlobContent `
     -File $Localfile `
     -Blob $Filename `
     -ErrorAction Stop -Force | Out-Null
-    
+
 $publicSettings = @{
     "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$FileName");
     "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$FileName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword";
@@ -185,7 +203,7 @@ $publicSettings = @{
 "Get information about the scale set"
 $vmss = Get-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
-    -VMScaleSetName "ScaleSet"
+    -VMScaleSetName $vmssScaleSetName
 
 "Use Custom Script Extension to install VSTS Agent"
 Add-AzureRmVmssExtension -VirtualMachineScaleSet $vmss `
@@ -199,7 +217,7 @@ Add-AzureRmVmssExtension -VirtualMachineScaleSet $vmss `
 "Update the scale set and apply the Custom Script Extension to the VM instances"
 Update-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
-    -Name "ScaleSet" `
+    -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmss
-    
+
 "Finished creating VM Scale Set and installing Agent"
