@@ -7,7 +7,8 @@ Param(
     [String[]]
     $VSTSUrl,
     $windowsLogonAccount,
-    $windowsLogonPassword
+    $windowsLogonPassword,
+    $poolName = "Default"
 )
 
 $ErrorActionPreference="Stop";
@@ -53,7 +54,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.Z
              --url $VSTSUrl `
              --auth PAT `
              --token $VSTSToken `
-             --pool "Default" `
+             --pool $poolName `
              --agent $env:COMPUTERNAME `
              --replace `
              --runasservice `

@@ -14,7 +14,8 @@ Param(
     #if not specified otherwise - PIP is deployed at destroyable RG; otherwise it could be located at other RG, guaranteeing that it is left after reprovisioning
     [string]$pipRg,
     [int]$vmssCapacity = 1,
-    [string]$vmssSkuName = "Standard_D4s_v3"
+    [string]$vmssSkuName = "Standard_D4s_v3",
+    [string]$vstsPoolName = "Default"
 )
 
 #Construct resources names
@@ -205,7 +206,7 @@ Set-AzureStorageBlobContent `
 
 $publicSettings = @{
     "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$blobName");
-    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword";
+    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName";
 };
 
 "Get information about the scale set"
