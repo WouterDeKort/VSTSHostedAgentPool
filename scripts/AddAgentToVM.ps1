@@ -16,13 +16,13 @@ If(-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentit
 {
      throw "Run command in Administrator PowerShell Prompt"
 };
-     
+
 if(-NOT (Test-Path $env:SystemDrive\'vstsagent'))
 {
     mkdir $env:SystemDrive\'vstsagent'
-}; 
+};
 
-Set-Location $env:SystemDrive\'vstsagent'; 
+Set-Location $env:SystemDrive\'vstsagent';
 
 for($i=1; $i -lt 100; $i++)
 {
@@ -33,18 +33,18 @@ for($i=1; $i -lt 100; $i++)
         Set-Location $destFolder;
         break;
     }
-}; 
+};
 
 $agentZip="$PWD\agent.zip";
 
 $DefaultProxy=[System.Net.WebRequest]::DefaultWebProxy;
-$WebClient=New-Object Net.WebClient; 
-$Uri='https://vstsagentpackage.azureedge.net/agent/2.127.0/vsts-agent-win-x64-2.127.0.zip';
+$WebClient=New-Object Net.WebClient;
+$Uri='https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip';
 
 if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri)))
 {
     $WebClient.Proxy = New-Object Net.WebProxy($DefaultProxy.GetProxy($Uri).OriginalString, $True);
-}; 
+};
 
 $WebClient.DownloadFile($Uri, $agentZip);
 Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.ZipFile]::ExtractToDirectory($agentZip, "$PWD");
@@ -59,7 +59,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.Z
              --runasservice `
              --work '_work' `
              --windowsLogonAccount $windowsLogonAccount `
-             --windowsLogonPassword $windowsLogonPassword 
+             --windowsLogonPassword $windowsLogonPassword
 
 Remove-Item $agentZip;
 

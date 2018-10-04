@@ -2,6 +2,7 @@
 Param(
     [string]$VMUser = $env:VMUser,
     [string]$VMUserPassword = $env:VMUserPassword,
+    #could not be longer than 9 symbols
     [string]$VMName = $env:VMName,
     [string]$ManagedImageResourceGroupName = $env:ManagedImageResourceGroupName,
     [string]$ManagedImageName = $env:ManagedImageName,
@@ -159,20 +160,21 @@ New-AzureRmVmss `
 
 "Deploying Agent script to VM"
 
-$StorageAccountName = "scriptstorage"
+$StorageAccountName = $resourcesBaseName + "storage"
+$StorageAccountName = $StorageAccountName -replace '-',''
 $ContainerName = "scripts"
 
 $StorageAccountAvailability = Get-AzureRmStorageAccountNameAvailability -Name $StorageAccountName
 
 if ($StorageAccountAvailability.NameAvailable) {
-    "Creating storage account $StorageAccountName in $AgentPoolResourceGroup"
-    New-AzureRmStorageAccount -ResourceGroupName $AgentPoolResourceGroup -AccountName $StorageAccountName -Location $Location -SkuName "Standard_LRS"
+    "Creating storage account $StorageAccountName in $ManagedImageResourceGroupName"
+    New-AzureRmStorageAccount -ResourceGroupName $ManagedImageResourceGroupName -AccountName $StorageAccountName -Location $Location -SkuName "Standard_LRS"
 }
 else {
-    "Storage account $StorageAccountName in $AgentPoolResourceGroup already exists"
+    "Storage account $StorageAccountName in $ManagedImageResourceGroupName already exists"
 }
 
-$StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $AgentPoolResourceGroup -Name $StorageAccountName).Value[0]
+$StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $ManagedImageResourceGroupName -Name $StorageAccountName).Value[0]
 $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
 
 $container = Get-AzureStorageContainer -Context $StorageContext |  where-object {$_.Name -eq "scripts"}
@@ -185,6 +187,8 @@ else {
 }
 
 $FileName = "AddAgentToVM.ps1";
+$currentDatePostfix = Get-Date -format "MMddyyyyHHmm";
+$blobName = "addAgentToVM" + $currentDatePostfix + ".ps1"
 $basePath = $PWD;
 if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
     $basePath = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY/VSTSHostedAgentPool"
@@ -196,12 +200,12 @@ Set-AzureStorageBlobContent `
     -Container $ContainerName `
     -Context $StorageContext `
     -File $Localfile `
-    -Blob $Filename `
+    -Blob $blobName `
     -ErrorAction Stop -Force | Out-Null
 
 $publicSettings = @{
-    "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$FileName");
-    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$FileName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword";
+    "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$blobName");
+    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword";
 };
 
 "Get information about the scale set"
