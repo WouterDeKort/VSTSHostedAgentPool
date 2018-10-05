@@ -1,5 +1,5 @@
 queue:
-  name: $(AgentPoolName)
+  name: AzureHostedAgents
   timeoutInMinutes: 600
 
 steps:
