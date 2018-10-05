@@ -1,4 +1,4 @@
 [submodule "vsts-image-generation"]
 	path = vsts-image-generation
-	url = git@github.com:akuryan/vsts-image-generation.git
+	url = https://github.com/akuryan/vsts-image-generation.git
 	branch = master
