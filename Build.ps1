@@ -21,7 +21,7 @@ if ($InstallPrerequisites) {
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
     "Install Packer"
-    choco install packer -y
+    choco install packer --version 1.2.5 -y
     "Install Git"
     choco install git -y
 
