@@ -42,15 +42,15 @@ if (-Not $notPresent) {
     Remove-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Force
 }
 
-"Creating new resource group $AgentPoolResourceGroup"
+Write-Host "Creating new resource group $AgentPoolResourceGroup"
 New-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Location $Location
 
-"Create a virtual network subnet"
+Write-Host "Create a virtual network subnet"
 $subnet = New-AzureRmVirtualNetworkSubnetConfig `
     -Name $subnetName `
     -AddressPrefix 10.0.0.0/24
 
-"Create a virtual network"
+Write-Host "Create a virtual network"
 $vnet = New-AzureRmVirtualNetwork `
     -ResourceGroupName $AgentPoolResourceGroup `
     -Name $vnetName `
@@ -62,7 +62,7 @@ $vnet = New-AzureRmVirtualNetwork `
 
 Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName -$pipRg -ev pipNotPresent -ea 0
 if ($pipNotPresent){
-    "Create a public IP address"
+    Write-Host "Create a public IP address"
     $publicIP = New-AzureRmPublicIpAddress `
         -ResourceGroupName $pipRg `
         -Location $Location `
@@ -71,14 +71,14 @@ if ($pipNotPresent){
         -Force
 }
 
-"Create a frontend and backend IP pool"
+Write-Host "Create a frontend and backend IP pool"
 $frontendIP = New-AzureRmLoadBalancerFrontendIpConfig `
     -Name "FrontEndPool" `
     -PublicIpAddress $publicIP
 $backendPool = New-AzureRmLoadBalancerBackendAddressPoolConfig `
     -Name "BackEndPool"
 
-"Create a Network Address Translation (NAT) pool"
+Write-Host "Create a Network Address Translation (NAT) pool"
 $inboundNATPool = New-AzureRmLoadBalancerInboundNatPoolConfig `
     -Name "RDPRule" `
     -FrontendIpConfigurationId $frontendIP.Id `
@@ -87,7 +87,7 @@ $inboundNATPool = New-AzureRmLoadBalancerInboundNatPoolConfig `
     -FrontendPortRangeEnd 59999 `
     -BackendPort 3389
 
-"Create the load balancer"
+Write-Host "Create the load balancer"
 $lb = New-AzureRmLoadBalancer `
     -ResourceGroupName $AgentPoolResourceGroup `
     -Name $lbName `
@@ -97,7 +97,7 @@ $lb = New-AzureRmLoadBalancer `
     -InboundNatPool $inboundNATPool `
     -Force
 
-"Create a load balancer health probe on port 80"
+Write-Host "Create a load balancer health probe on port 80"
 Add-AzureRmLoadBalancerProbeConfig -Name "HealthProbe" `
     -LoadBalancer $lb `
     -Protocol TCP `
@@ -105,7 +105,7 @@ Add-AzureRmLoadBalancerProbeConfig -Name "HealthProbe" `
     -IntervalInSeconds 15 `
     -ProbeCount 2
 
-"Create a load balancer rule to distribute traffic on port 80"
+Write-Host "Create a load balancer rule to distribute traffic on port 80"
 Add-AzureRmLoadBalancerRuleConfig `
     -Name "LoadBalancerRule" `
     -LoadBalancer $lb `
@@ -115,17 +115,17 @@ Add-AzureRmLoadBalancerRuleConfig `
     -FrontendPort 80 `
     -BackendPort 80
 
-"Update the load balancer configuration"
+Write-Host "Update the load balancer configuration"
 Set-AzureRmLoadBalancer -LoadBalancer $lb
 
-"Create IP address configurations"
+Write-Host "Create IP address configurations"
 $ipConfig = New-AzureRmVmssIpConfig `
     -Name "IPConfig" `
     -LoadBalancerBackendAddressPoolsId $lb.BackendAddressPools[0].Id `
     -LoadBalancerInboundNatPoolsId $inboundNATPool.Id `
     -SubnetId $vnet.Subnets[0].Id
 
-"Create a config object"
+Write-Host "Create a config object"
 $vmssConfig = New-AzureRmVmssConfig `
     -Location $Location `
     -SkuCapacity $vmssCapacity `
@@ -141,26 +141,26 @@ Set-AzureRmVmssStorageProfile $vmssConfig `
     -OsDiskOsType Windows `
     -ImageReferenceId $image.id
 
-"Set up information for authenticating with the virtual machine"
+Write-Host "Set up information for authenticating with the virtual machine"
 Set-AzureRmVmssOsProfile $vmssConfig `
     -AdminUsername $VMUser `
     -AdminPassword $VMUserPassword `
     -ComputerNamePrefix $VMName
 
-"Attach the virtual network to the config object"
+Write-Host "Attach the virtual network to the config object"
 Add-AzureRmVmssNetworkInterfaceConfiguration `
     -VirtualMachineScaleSet $vmssConfig `
     -Name "network-config" `
     -Primary $true `
     -IPConfiguration $ipConfig
 
-"Create the scale set with the config object (this step might take a few minutes)"
+Write-Host "Create the scale set with the config object (this step might take a few minutes)"
 New-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
     -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmssConfig
 
-"Deploying Agent script to VM"
+Write-Host "Deploying Agent script to VM"
 
 $StorageAccountName = $resourcesBaseName + "storage"
 $StorageAccountName = $StorageAccountName -replace '-',''
@@ -169,11 +169,11 @@ $ContainerName = "scripts"
 $StorageAccountAvailability = Get-AzureRmStorageAccountNameAvailability -Name $StorageAccountName
 
 if ($StorageAccountAvailability.NameAvailable) {
-    "Creating storage account $StorageAccountName in $ManagedImageResourceGroupName"
+    Write-Host "Creating storage account $StorageAccountName in $ManagedImageResourceGroupName"
     New-AzureRmStorageAccount -ResourceGroupName $ManagedImageResourceGroupName -AccountName $StorageAccountName -Location $Location -SkuName "Standard_LRS"
 }
 else {
-    "Storage account $StorageAccountName in $ManagedImageResourceGroupName already exists"
+    Write-Host "Storage account $StorageAccountName in $ManagedImageResourceGroupName already exists"
 }
 
 $StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $ManagedImageResourceGroupName -Name $StorageAccountName).Value[0]
@@ -181,11 +181,11 @@ $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountNam
 
 $container = Get-AzureStorageContainer -Context $StorageContext |  where-object {$_.Name -eq "scripts"}
 if ( -Not $container) {
-    "Creating container $ContainerName in $StorageAccountName"
+    Write-Host "Creating container $ContainerName in $StorageAccountName"
     New-AzureStorageContainer -Name $ContainerName -Context $StorageContext -Permission blob
 }
 else {
-    "Container $ContainerName in $StorageAccountName already exists"
+    Write-Host "Container $ContainerName in $StorageAccountName already exists"
 }
 
 $FileName = "AddAgentToVM.ps1";
@@ -197,7 +197,7 @@ if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
 }
 $LocalFile = "$basePath/scripts\$FileName"
 
-"Uploading file $LocalFile to $StorageAccountName"
+Write-Host "Uploading file $LocalFile to $StorageAccountName"
 Set-AzureStorageBlobContent `
     -Container $ContainerName `
     -Context $StorageContext `
@@ -210,12 +210,12 @@ $publicSettings = @{
     "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName";
 };
 
-"Get information about the scale set"
+Write-Host "Get information about the scale set"
 $vmss = Get-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
     -VMScaleSetName $vmssScaleSetName
 
-"Use Custom Script Extension to install VSTS Agent"
+Write-Host "Use Custom Script Extension to install VSTS Agent"
 Add-AzureRmVmssExtension -VirtualMachineScaleSet $vmss `
     -Name "VSTS_Agent_Install" `
     -Publisher "Microsoft.Compute" `
@@ -224,10 +224,10 @@ Add-AzureRmVmssExtension -VirtualMachineScaleSet $vmss `
     -ErrorAction Stop `
     -Setting $publicSettings
 
-"Update the scale set and apply the Custom Script Extension to the VM instances"
+Write-Host "Update the scale set and apply the Custom Script Extension to the VM instances"
 Update-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
     -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmss
 
-"Finished creating VM Scale Set and installing Agent"
+Write-Host "Finished creating VM Scale Set and installing Agent"
