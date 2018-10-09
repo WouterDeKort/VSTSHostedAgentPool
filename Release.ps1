@@ -158,18 +158,23 @@ Add-AzureRmVmssNetworkInterfaceConfiguration `
     -IPConfiguration $ipConfig
 
 Write-Host "Create the scale set with the config object (this step might take a few minutes)"
+New-AzureRmVmss `
+-ResourceGroupName $AgentPoolResourceGroup `
+-Name $vmssScaleSetName `
+-VirtualMachineScaleSet $vmssConfig
 if ($attachDataDisk) {
-    New-AzureRmVmss `
-    -ResourceGroupName $AgentPoolResourceGroup `
-    -Name $vmssScaleSetName `
-    -VirtualMachineScaleSet $vmssConfig `
-    -DataDiskSizeInGb $vmssDataDiskSize
-} else {
-    Write-Host "Creating VMSS WITHOUT data disk"
-    New-AzureRmVmss `
-    -ResourceGroupName $AgentPoolResourceGroup `
-    -Name $vmssScaleSetName `
-    -VirtualMachineScaleSet $vmssConfig
+    $vmss = Get-AzureRmVmss `
+          -ResourceGroupName $AgentPoolResourceGroup `
+          -VMScaleSetName $vmssScaleSetName;
+    Add-AzureRmVmssDataDisk `
+        -VirtualMachineScaleSet $vmvmssScaleSetNamess `
+        -CreateOption Empty `
+        -Lun 0 `
+        -DiskSizeGB $vmssDataDiskSize
+    Update-AzureRmVmss `
+      -ResourceGroupName $AgentPoolResourceGroup `
+      -Name $vmssScaleSetName `
+      -VirtualMachineScaleSet $vmss
 }
 
 
