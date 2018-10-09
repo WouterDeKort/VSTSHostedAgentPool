@@ -15,7 +15,8 @@ Param(
     [string]$pipRg,
     [int]$vmssCapacity = 1,
     [string]$vmssSkuName = "Standard_D4s_v3",
-    [string]$vstsPoolName = "Default"
+    [string]$vstsPoolName = "Default",
+    [string]$vmssDiskStorageAccount = "Premium_LRS"
 )
 
 #Construct resources names
@@ -135,7 +136,7 @@ $vmssConfig = New-AzureRmVmssConfig `
 $image = Get-AzureRMImage -ImageName $ManagedImageName -ResourceGroupName $ManagedImageResourceGroupName
 Set-AzureRmVmssStorageProfile $vmssConfig `
     -OsDiskCreateOption FromImage `
-    -ManagedDisk PremiumLRS `
+    -ManagedDisk $vmssDiskStorageAccount `
     -OsDiskCaching "None" `
     -OsDiskOsType Windows `
     -ImageReferenceId $image.id
