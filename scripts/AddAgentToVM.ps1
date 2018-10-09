@@ -8,7 +8,9 @@ Param(
     $VSTSUrl,
     $windowsLogonAccount,
     $windowsLogonPassword,
-    $poolName = "Default"
+    $poolName = "Default",
+    $vstsAgentUri = "https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip",
+    $prepareDataDisks = $true
 )
 
 $ErrorActionPreference="Stop";
@@ -40,7 +42,7 @@ $agentZip="$PWD\agent.zip";
 
 $DefaultProxy=[System.Net.WebRequest]::DefaultWebProxy;
 $WebClient=New-Object Net.WebClient;
-$Uri='https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip';
+$Uri=$vstsAgentUri;
 
 if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri)))
 {
@@ -50,6 +52,32 @@ if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri)))
 $WebClient.DownloadFile($Uri, $agentZip);
 Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.ZipFile]::ExtractToDirectory($agentZip, "$PWD");
 
+#will default to directly attached disk, if data disk is not there
+$agentWorkFolder = "D:\w"
+
+if ($prepareDataDisks) {
+    $disks = Get-Disk | Where-Object partitionstyle -eq 'raw' | Sort-Object number
+
+    $letters = 70..89 | ForEach-Object { [char]$_ }
+    $count = 0
+    $label = "datadisk"
+
+    foreach ($disk in $disks) {
+        $driveLetter = $letters[$count].ToString()
+        $disk | 
+        Initialize-Disk -PartitionStyle MBR -PassThru |
+        New-Partition -UseMaximumSize -DriveLetter $driveLetter |
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel $label.$count -Confirm:$false -Force
+        #we have a data disk - so, we will use it :)
+        $agentWorkFolder = $driveLetter + ":\w";
+    $count++
+    }
+}
+
+if(-NOT (Test-Path ($agentWorkFolder))) {
+    mkdir $agentWorkFolder;
+}
+
 .\config.cmd --unattended `
              --url $VSTSUrl `
              --auth PAT `
@@ -58,7 +86,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.Z
              --agent $env:COMPUTERNAME `
              --replace `
              --runasservice `
-             --work '_work' `
+             --work $agentWorkFolder `
              --windowsLogonAccount $windowsLogonAccount `
              --windowsLogonPassword $windowsLogonPassword
 

@@ -16,7 +16,10 @@ Param(
     [int]$vmssCapacity = 1,
     [string]$vmssSkuName = "Standard_D4s_v3",
     [string]$vstsPoolName = "Default",
-    [string]$vmssDiskStorageAccount = "Premium_LRS"
+    [string]$vmssDiskStorageAccount = "Premium_LRS",
+    [int]$vmssDataDiskSize = 64,
+    #by default we will attach a dataDisk
+    [switch]$attachDataDisks
 )
 
 #Construct resources names
@@ -155,10 +158,20 @@ Add-AzureRmVmssNetworkInterfaceConfiguration `
     -IPConfiguration $ipConfig
 
 Write-Host "Create the scale set with the config object (this step might take a few minutes)"
-New-AzureRmVmss `
+if ($attachDataDisk) {
+    New-AzureRmVmss `
+    -ResourceGroupName $AgentPoolResourceGroup `
+    -Name $vmssScaleSetName `
+    -VirtualMachineScaleSet $vmssConfig `
+    -DataDiskSizeInGb $vmssDataDiskSize
+} else {
+    Write-Host "Creating VMSS WITHOUT data disk"
+    New-AzureRmVmss `
     -ResourceGroupName $AgentPoolResourceGroup `
     -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmssConfig
+}
+
 
 Write-Host "Deploying Agent script to VM"
 
@@ -207,7 +220,7 @@ Set-AzureStorageBlobContent `
 
 $publicSettings = @{
     "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$blobName");
-    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName";
+    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName -prepareDataDisks $attachDataDisks";
 };
 
 Write-Host "Get information about the scale set"
