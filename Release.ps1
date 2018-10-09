@@ -192,9 +192,9 @@ $FileName = "AddAgentToVM.ps1";
 $currentDatePostfix = Get-Date -format "MMddyyyyHHmm";
 $blobName = "addAgentToVM" + $currentDatePostfix + ".ps1"
 $basePath = $PWD;
-if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
-    $basePath = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY/VSTSHostedAgentPool"
-}
+#if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
+    #$basePath = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY/VSTSHostedAgentPool"
+#}
 $LocalFile = "$basePath/scripts\$FileName"
 
 Write-Host "Uploading file $LocalFile to $StorageAccountName"
