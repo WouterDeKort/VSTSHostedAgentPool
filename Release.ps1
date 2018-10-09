@@ -19,7 +19,7 @@ Param(
     [string]$vmssDiskStorageAccount = "Premium_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
-    [switch]$attachDataDisks = $true
+    [switch]$attachDataDisk = $true
 )
 
 #Construct resources names
@@ -220,7 +220,7 @@ Set-AzureStorageBlobContent `
 
 $publicSettings = @{
     "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$blobName");
-    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName -prepareDataDisks $attachDataDisks";
+    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName -prepareDataDisks $attachDataDisk";
 };
 
 Write-Host "Get information about the scale set"
