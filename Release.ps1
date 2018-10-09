@@ -19,7 +19,7 @@ Param(
     [string]$vmssDiskStorageAccount = "Premium_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
-    [switch]$attachDataDisks
+    [switch]$attachDataDisks = $true
 )
 
 #Construct resources names
