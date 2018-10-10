@@ -164,10 +164,10 @@ New-AzureRmVmss `
 -VirtualMachineScaleSet $vmssConfig
 if ($attachDataDisk) {
     $vmss = Get-AzureRmVmss `
-          -ResourceGroupName $AgentPoolResourceGroup `
-          -VMScaleSetName $vmssScaleSetName;
+        -ResourceGroupName $AgentPoolResourceGroup `
+        -VMScaleSetName $vmssScaleSetName;
     Add-AzureRmVmssDataDisk `
-        -VirtualMachineScaleSet $vmssScaleSetName `
+        -VirtualMachineScaleSet $vmss `
         -CreateOption Empty `
         -Lun 0 `
         -DiskSizeGB $vmssDataDiskSize `
