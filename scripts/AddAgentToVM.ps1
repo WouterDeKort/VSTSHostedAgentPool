@@ -9,7 +9,7 @@ Param(
     $windowsLogonAccount,
     $windowsLogonPassword,
     $poolName = "Default",
-    $vstsAgentUri = "https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip",
+    $vstsAgentPackageUri = "https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip",
     $prepareDataDisks = $true
 )
 
@@ -42,7 +42,7 @@ $agentZip="$PWD\agent.zip";
 
 $DefaultProxy=[System.Net.WebRequest]::DefaultWebProxy;
 $WebClient=New-Object Net.WebClient;
-$Uri=$vstsAgentUri;
+$Uri=$vstsAgentPackageUri;
 
 if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri)))
 {

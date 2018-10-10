@@ -16,6 +16,7 @@ Param(
     [int]$vmssCapacity = 1,
     [string]$vmssSkuName = "Standard_D4s_v3",
     [string]$vstsPoolName = "Default",
+    [string]$vstsAgentPackageUri = "https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip",
     [string]$vmssDiskStorageAccount = "Premium_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
@@ -210,7 +211,7 @@ else {
 $FileName = "AddAgentToVM.ps1";
 $currentDatePostfix = Get-Date -format "MMddyyyyHHmm";
 $blobName = "addAgentToVM" + $currentDatePostfix + ".ps1"
-$basePath = $PWD;
+$basePath = $PSScriptRoot;
 #if ($env:SYSTEM_DEFAULTWORKINGDIRECTORY) {
     #$basePath = "$env:SYSTEM_DEFAULTWORKINGDIRECTORY/VSTSHostedAgentPool"
 #}
@@ -226,7 +227,7 @@ Set-AzureStorageBlobContent `
 
 $publicSettings = @{
     "fileUris"         = @("https://$StorageAccountName.blob.core.windows.net/$ContainerName/$blobName");
-    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName -prepareDataDisks $attachDataDisk";
+    "commandToExecute" = "PowerShell -ExecutionPolicy Unrestricted .\$blobName -VSTSToken $VSTSToken -VSTSUrl $VSTSUrl -windowsLogonAccount $VMUser -windowsLogonPassword $VMUserPassword -poolName $vstsPoolName -vstsAgentPackageUri $vstsAgentPackageUri -prepareDataDisks $attachDataDisk";
 };
 
 Write-Host "Get information about the scale set"
