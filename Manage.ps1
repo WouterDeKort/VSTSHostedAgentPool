@@ -1,11 +1,13 @@
 [CmdletBinding()]
 Param(
-    [string]$ResourceGroup,
-    [string]$ScaleSet = "ScaleSet",
+    [string]$resourcesBaseName,
     [Parameter(Mandatory=$true)]
     $Action
 
 )
+
+$ResourceGroup = $resourcesBaseName + "-rg";
+$ScaleSet = $resourcesBaseName + "-vmss";
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

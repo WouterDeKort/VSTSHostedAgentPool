@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param(
     [string]$AgentPoolResourceGroup = $env:AgentPoolResourceGroup,
-    $Capacity = $env:Capacity
+    $Capacity = $env:vmssCapacity
 )
 
 Set-StrictMode -Version Latest
