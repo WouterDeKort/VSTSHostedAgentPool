@@ -250,4 +250,8 @@ Update-AzureRmVmss `
     -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmss
 
+Write-Host "Assigning tags to resource"
+$azureResourceInfo = Find-AzureRmResource -ResourceNameEquals $AgentPoolResourceGroup -ResourceNameEquals $vmssScaleSetName;
+Set-AzureRmResource -Tag @{ billingCategory="DevProductivity"; environment="Dev"; resourceType="AzureDevOps" } -ResourceName $vmssScaleSetName -ResourceType $azureResourceInfo.resourceType -ResourceGroupName $AgentPoolResourceGroup -Force;
+
 Write-Host "Finished creating VM Scale Set and installing Agent"
