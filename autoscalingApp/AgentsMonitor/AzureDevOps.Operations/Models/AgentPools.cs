@@ -1,8 +1,13 @@
 ﻿namespace AzureDevOps.Operations.Models
 {
+    using AzureDevOps.Operations.Models.Partials;
     using Newtonsoft.Json;
     using System;
 
+    /// <summary>
+    /// Get all pools https://{instanceName}.visualstudio.com/_apis/distributedtask/pools?api-version=4.1
+    /// Generated with help of https://app.quicktype.io/#l=cs&amp;r=json2csharp
+    /// </summary>
     public partial class AgentsPools
     {
         [JsonProperty("count", NullValueHandling = NullValueHandling.Ignore)]
@@ -60,7 +65,7 @@
         public Uri Url { get; set; }
 
         [JsonProperty("_links", NullValueHandling = NullValueHandling.Ignore)]
-        public Links Links { get; set; }
+        public AvatarLinks Links { get; set; }
 
         [JsonProperty("id", NullValueHandling = NullValueHandling.Ignore)]
         public Guid? Id { get; set; }
@@ -78,15 +83,9 @@
         public string Descriptor { get; set; }
     }
 
-    public partial class Links
+    public partial class AvatarLinks
     {
         [JsonProperty("avatar", NullValueHandling = NullValueHandling.Ignore)]
-        public Avatar Avatar { get; set; }
-    }
-
-    public partial class Avatar
-    {
-        [JsonProperty("href", NullValueHandling = NullValueHandling.Ignore)]
-        public Uri Href { get; set; }
+        public LinkSelf Avatar { get; set; }
     }
 }

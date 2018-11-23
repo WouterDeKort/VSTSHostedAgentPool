@@ -49,6 +49,10 @@
     <Compile Include="Classes\Retrieve.cs" />
     <Compile Include="Helpers\GetData.cs" />
     <Compile Include="Models\AgentPools.cs" />
+    <Compile Include="Models\Agents.cs" />
+    <Compile Include="Models\JobRequests.cs" />
+    <Compile Include="Models\Partials\Links.cs" />
+    <Compile Include="Models\Partials\LinkSelf.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
