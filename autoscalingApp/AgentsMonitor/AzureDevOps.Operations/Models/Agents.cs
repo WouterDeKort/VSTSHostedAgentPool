@@ -8,6 +8,7 @@ namespace AzureDevOps.Operations.Models
 
     /// <summary>
     /// Get all agents and theirs status via https://{instanceName}.visualstudio.com/_apis/distributedtask/pools/{poolId}/agents?api-version=4.1
+    /// or https://dev.azure.com/{instanceName}/_apis/distributedtask/pools/{poolId}/agents?api-version=4.1
     /// Generated with help of https://app.quicktype.io/#l=cs&amp;r=json2csharp
     /// </summary>
     public partial class Agents
