@@ -11,7 +11,7 @@ namespace AzureDevOps.Operations.Helpers
     /// <summary>
     /// Accesses data from Azure DevOps server
     /// </summary>
-    public static class GetData
+    internal static class GetData
     {
         /// <summary>
         /// Get data from Azure DevOps server and deserialize it 
