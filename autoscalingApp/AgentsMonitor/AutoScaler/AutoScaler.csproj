@@ -74,6 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefinitionChecker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -81,6 +82,12 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <Content Include="settings.job" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AzureDevOps.Operations\AzureDevOps.Operations.csproj">
+      <Project>{bd529953-84b8-4b37-a4b8-e8e3c8721dac}</Project>
+      <Name>AzureDevOps.Operations</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

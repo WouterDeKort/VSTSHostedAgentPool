@@ -1,27 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AzureDevOps.Operations.Classes;
 using Microsoft.Azure.WebJobs;
+using System.Configuration;
 
 namespace AutoScaler
 {
     class Program
     {
-        private const string AgentsPoolNameSettingName = "AgentsPoolName";
-        private const string AgentsPoolIdSettingName = "AgentsPoolId";
-
         static void Main()
         {
-            if (string.IsNullOrWhiteSpace(
-                    System.Configuration.ConfigurationManager.AppSettings[AgentsPoolNameSettingName]) ||
-                string.IsNullOrWhiteSpace(
-                    System.Configuration.ConfigurationManager.AppSettings[AgentsPoolIdSettingName]))
-            {
-                //log error and exit with non success exit code
-                Environment.Exit(-1);
-            }
+            //check all required settings
+            DefinitionChecker.CheckAllSettings();
 
             var config = new JobHostConfiguration();
 
@@ -37,7 +26,81 @@ namespace AutoScaler
         [NoAutomaticTrigger]
         public static void CheckQueue()
         {
+            var poolIdSetting = ConfigurationManager.AppSettings[Constants.AgentsPoolIdSettingName];
 
+            var organizationName = ConfigurationManager.AppSettings[Constants.AzureDevOpsInstanceSettingName];
+            var accessToken = ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName];
+
+            var dataRetriever = new Retrieve(organizationName, accessToken);
+            int poolId;
+            //if poolId is not defined in settings - we need to retrieve it
+            if (string.IsNullOrWhiteSpace(poolIdSetting))
+            {
+                var agentsPoolName = ConfigurationManager.AppSettings[Constants.AgentsPoolNameSettingName];
+                var poolIdNullable = dataRetriever.GetPoolId(agentsPoolName);
+                if (poolIdNullable == null)
+                {
+                    //something went wrong 
+                    Console.WriteLine($"Could not retrieve pool id for {agentsPoolName}, have to exit");
+                    Environment.Exit(Constants.ErrorExitCode);
+                }
+                poolId = poolIdNullable.Value;
+            }
+            else
+            {
+                //poolId is defined in settings, we need to parse it now
+                if (!int.TryParse(poolIdSetting, out poolId))
+                {
+                    Console.WriteLine($"Could not parse pool id from appSetting {Constants.AgentsPoolIdSettingName}. Exiting...");
+                    Environment.Exit(Constants.ErrorExitCode);
+                }
+            }
+
+            var maxAgentsCount = dataRetriever.GetAllAccessibleAgents(poolId);
+
+            if (maxAgentsCount == 0)
+            {
+                Console.WriteLine($"There is 0 agents assigned to pool with id {poolId}. Could not proceed, exiting...");
+                Environment.Exit(Constants.ErrorExitCode);
+            }
+
+            var onlineAgentsCount = 0;
+            var countNullable = dataRetriever.GetOnlineAgentsCount(poolId);
+            if (countNullable == null)
+            {
+                //something went wrong
+                Console.WriteLine("Could not retrieve amount of agents online, exiting...");
+                Environment.Exit(Constants.ErrorExitCode);
+            }
+            else
+            {
+                onlineAgentsCount = (int) countNullable.Value;
+            }
+
+            if (onlineAgentsCount == maxAgentsCount)
+            {
+                //we could not add anything more in here
+                Console.WriteLine("We have maximum agents assigned, could not do anything more");
+                Environment.Exit(Constants.SuccessExitCode);
+            }
+
+            var waitingJobsCount = dataRetriever.GetCurrentJobsRunning(poolId);
+
+            if (waitingJobsCount == onlineAgentsCount)
+            {
+                //nothing to do here
+                Environment.Exit(Constants.SuccessExitCode);
+            }
+
+            if (waitingJobsCount < onlineAgentsCount)
+            {
+                //downscale agent pool, but keep 1 agent running for 1 hour more
+            }
+
+            if (waitingJobsCount > onlineAgentsCount)
+            {
+                //add more agents, but not more than allowed
+            }
         }
     }
 }
