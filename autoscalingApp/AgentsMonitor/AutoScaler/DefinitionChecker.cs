@@ -18,17 +18,17 @@ namespace AutoScaler
                 Environment.Exit(Constants.ErrorExitCode);
             }
 
-            ExitIfFail(ConfigurationManager.AppSettings[Constants.AzureDevOpsInstanceSettingName], "Azure DevOps instance name");
-            ExitIfFail(ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName], "Azure DevOps PAT");
+            ExitIfSettingEmpty(ConfigurationManager.AppSettings[Constants.AzureDevOpsInstanceSettingName], "Azure DevOps instance name");
+            ExitIfSettingEmpty(ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName], "Azure DevOps PAT");
         }
 
-        private static void ExitIfFail(string settingName, string errorMessage = "Setting is not defined")
+        private static void ExitIfSettingEmpty(string settingName, string errorMessage = "Setting")
         {
             if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings[settingName]))
             {
                 return;
             }
-            Console.WriteLine($"{errorMessage} in {settingName}. Exiting...");
+            Console.WriteLine($"{errorMessage} is not defined in {settingName}. Exiting...");
             Environment.Exit(Constants.ErrorExitCode);
         }
     }
