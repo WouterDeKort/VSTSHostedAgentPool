@@ -6,6 +6,9 @@ namespace AutoScaler
 {
     public static class DefinitionChecker
     {
+        /// <summary>
+        /// Checks that all required settings are defined; if check fails - job will exit
+        /// </summary>
         public static void CheckAllSettings()
         {
             if (string.IsNullOrWhiteSpace(
@@ -22,6 +25,11 @@ namespace AutoScaler
             ExitIfSettingEmpty(ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName], "Azure DevOps PAT");
         }
 
+        /// <summary>
+        /// Checks setting, that it is not empty
+        /// </summary>
+        /// <param name="settingName"></param>
+        /// <param name="errorMessage"></param>
         private static void ExitIfSettingEmpty(string settingName, string errorMessage = "Setting")
         {
             if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings[settingName]))
