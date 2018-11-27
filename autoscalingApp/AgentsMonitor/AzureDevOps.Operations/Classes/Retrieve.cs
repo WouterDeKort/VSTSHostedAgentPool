@@ -2,6 +2,7 @@
 using AzureDevOps.Operations.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace AzureDevOps.Operations.Classes
 {
@@ -15,12 +16,17 @@ namespace AzureDevOps.Operations.Classes
         /// PAT (Personal Access Token) to access Azure DevOps
         /// </summary>
         private string AzureDevOpsPersonalAccessToken { get; }
+        /// <summary>
+        /// Needed for mocking and testing
+        /// </summary>
+        private readonly HttpClient _localHttpClient;
 
 
-        public Retrieve(string orgName, string token)
+        public Retrieve(string orgName, string token, HttpClient httpClient)
         {
             AzureDevOpsOrganizationName = orgName;
             AzureDevOpsPersonalAccessToken = token;
+            _localHttpClient = httpClient;
         }
         /// <summary>
         /// Starting string for an URL
@@ -40,7 +46,7 @@ namespace AzureDevOps.Operations.Classes
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}";
 
-            var allPools = GetData.DownloadSerializedJsonData<AgentsPools>(url, AzureDevOpsPersonalAccessToken);
+            var allPools = GetData.DownloadSerializedJsonData<AgentsPools>(url, AzureDevOpsPersonalAccessToken, _localHttpClient);
 
             if (allPools == null)
             {
@@ -97,7 +103,7 @@ namespace AzureDevOps.Operations.Classes
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/jobrequests";
 
-            var allJobsRequests = GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken);
+            var allJobsRequests = GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken, _localHttpClient);
 
             //count amount of jobs without result - they are running
             return allJobsRequests?.AllJobRequests.Count(jobRequest => jobRequest.Result == null) ?? 0;
@@ -106,7 +112,7 @@ namespace AzureDevOps.Operations.Classes
         private Agents GetAllAgentsRunningNow(int agentsPoolId)
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/agents";
-            return GetData.DownloadSerializedJsonData<Agents>(url, AzureDevOpsPersonalAccessToken);
+            return GetData.DownloadSerializedJsonData<Agents>(url, AzureDevOpsPersonalAccessToken, _localHttpClient);
         }
     }
 }

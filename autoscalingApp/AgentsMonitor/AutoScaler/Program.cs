@@ -2,6 +2,7 @@
 using AzureDevOps.Operations.Classes;
 using Microsoft.Azure.WebJobs;
 using System.Configuration;
+using System.Net.Http;
 
 namespace AutoScaler
 {
@@ -30,8 +31,9 @@ namespace AutoScaler
 
             var organizationName = ConfigurationManager.AppSettings[Constants.AzureDevOpsInstanceSettingName];
             var accessToken = ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName];
+            var httpClient = new HttpClient();
 
-            var dataRetriever = new Retrieve(organizationName, accessToken);
+            var dataRetriever = new Retrieve(organizationName, accessToken, httpClient);
             int poolId;
             //if poolId is not defined in settings - we need to retrieve it
             if (string.IsNullOrWhiteSpace(poolIdSetting))

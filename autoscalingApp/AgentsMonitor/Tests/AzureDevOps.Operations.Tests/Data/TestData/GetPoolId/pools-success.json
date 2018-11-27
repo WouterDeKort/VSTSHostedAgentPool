@@ -1,0 +1,219 @@
+{
+  "count": 7,
+  "value": [
+    {
+      "createdOn": "2016-09-02T19:14:37.35Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "[testProject]\\testAccounts",
+        "url": "https://prented.to/be/valid/url",
+        "_links": { "avatar": { "href": "https://picsum.photos/200/300" } },
+        "id": "12345678-1234-1234-1234-123456789012",
+        "uniqueName": "vstfs:///someName",
+        "imageUrl": "https://picsum.photos/200/300",
+        "isContainer": true,
+        "descriptor": "desc"
+      },
+      "owner": {
+        "displayName": "[testProject]\\testAccounts",
+        "url": "https://prented.to/be/valid/url",
+        "_links": { "avatar": { "href": "https://picsum.photos/200/300" } },
+        "id": "12345678-1234-1234-1234-123456789012",
+        "uniqueName": "vstfs:///someName",
+        "imageUrl": "https://picsum.photos/200/300",
+        "isContainer": true,
+        "descriptor": "desc"
+      },
+      "id": 2,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2016-12-01T17:48:45.093Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "[testProject]\\testAccounts",
+        "url": "https://prented.to/be/valid/url",
+        "_links": { "avatar": { "href": "https://picsum.photos/200/300" } },
+        "id": "12345678-1234-1234-1234-123456789012",
+        "uniqueName": "vstfs:///someName",
+        "imageUrl": "https://picsum.photos/200/300",
+        "isContainer": true,
+        "descriptor": "desc"
+      },
+      "owner": {
+        "displayName": "[testProject]\\testAccounts",
+        "url": "https://prented.to/be/valid/url",
+        "_links": { "avatar": { "href": "https://picsum.photos/200/300" } },
+        "id": "12345678-1234-1234-1234-123456789012",
+        "uniqueName": "vstfs:///someName",
+        "imageUrl": "https://picsum.photos/200/300",
+        "isContainer": true,
+        "descriptor": "desc"
+      },
+      "id": 3,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted Linux Preview",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2017-03-16T21:02:17.127Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "owner": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "id": 4,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted VS2017",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2017-11-02T18:05:42.793Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "owner": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "id": 9,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted macOS",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2018-07-24T07:29:32.67Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "owner": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "id": 10,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted Ubuntu 1604",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2018-08-09T20:10:05.173Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "owner": {
+        "displayName": "Microsoft.VisualStudio.Services.TFS",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/descr" } },
+        "id": "00000002-0000-8888-8000-000000000000",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=00000002-0000-8888-8000-000000000000",
+        "descriptor": "descr"
+      },
+      "id": 11,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "Hosted Windows Container",
+      "isHosted": true,
+      "poolType": "automation",
+      "size": 2
+    },
+    {
+      "createdOn": "2018-10-04T12:14:35.33Z",
+      "autoProvision": true,
+      "autoSize": true,
+      "agentCloudId": null,
+      "createdBy": {
+        "displayName": "Anton Kuryan",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/sadsa" } },
+        "id": "c6b5ba88-76e4-4ecc-9c85-54ceb8a1a908",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=c6b5ba88-76e4-4ecc-9c85-54ceb8a1a908",
+        "descriptor": "sadsa"
+      },
+      "owner": {
+        "displayName": "Anton Kuryan",
+        "url": "https://app.vssps.visualstudio.com",
+        "_links": { "avatar": { "href": "https://dev.azure.com/testProject/_apis/GraphProfile/MemberAvatars/sadsa" } },
+        "id": "c6b5ba88-76e4-4ecc-9c85-54ceb8a1a908",
+        "uniqueName": "t@t.t",
+        "imageUrl": "https://dev.azure.com/testProject/_api/_common/identityImage?id=c6b5ba88-76e4-4ecc-9c85-54ceb8a1a908",
+        "descriptor": "sadsa"
+      },
+      "id": 12,
+      "scope": "5b7412e3-cf20-4e24-866e-b973c13cfc2d",
+      "name": "testPool",
+      "isHosted": false,
+      "poolType": "automation",
+      "size": 4
+    }
+  ]
+}
