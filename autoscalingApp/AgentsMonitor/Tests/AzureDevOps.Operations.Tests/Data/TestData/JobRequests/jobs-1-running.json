@@ -1,0 +1,298 @@
+{
+  "count": 5,
+  "value": [
+    {
+      "requestId": 12627,
+      "queueTime": "2018-11-27T13:55:12.8366667Z",
+      "assignTime": "2018-11-27T13:55:13.3966667Z",
+      "receiveTime": "2018-11-27T13:55:17.6650079Z",
+      "finishTime": "2018-11-27T13:56:33.38Z",
+      "result": "succeeded",
+      "serviceOwner": "12345678-0000-8888-8000-000000000000",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-5f3c-4cf4-a7b7-43adc4eee405",
+      "planType": "Release",
+      "planId": "12345678-3e0d-462b-aca6-4d33747a5893",
+      "jobId": "12345678-bf3a-420b-b0b9-8f3410d9099b",
+      "demands": [ "Agent.Version -gtVersion 2.120.0" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/15" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=15" }
+        },
+        "id": 15,
+        "name": "vstsagent000001",
+        "version": "2.140.2",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_release?definitionId=1" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/Release/definitions/1" }
+        },
+        "id": 1,
+        "name": "Deploy release"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_release?releaseId=104&_a=release-summary" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/Release/releases/104" }
+        },
+        "id": 276,
+        "name": "Release-104 / Deploy"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 12,
+      "agentDelays": [],
+      "orchestrationId": "0121321312312312024440c3e0d462baca64d33747a5893_e05219abbf3a420bb0b98f3410d9099b"
+    },
+    {
+      "requestId": 12626,
+      "queueTime": "2018-11-27T13:46:08.0066667Z",
+      "assignTime": "2018-11-27T13:46:08.63Z",
+      "receiveTime": "2018-11-27T13:46:11.040178Z",
+      "finishTime": "2018-11-27T13:54:39.8329651Z",
+      "result": "succeeded",
+      "serviceOwner": "12345678-6065-48ca-87d9-7f5672854ef7",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-5f3c-4cf4-a7b7-43adc4eee405",
+      "planType": "Build",
+      "planId": "12345678-0045-4d74-84db-5fd7dbaf4ed8",
+      "jobId": "12345678-1c7a-5b21-02e1-d41a394e29c9",
+      "demands": [ "msbuild", "visualstudio", "vstest", "java", "node.js", "Agent.Version -gtVersion 2.119.1" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/15" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=15" }
+        },
+        "id": 15,
+        "name": "vstsagent000001",
+        "version": "2.140.2",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_build/definition?definitionId=23" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/build/Definitions/23" }
+        },
+        "id": 23,
+        "name": "web app"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_build/results?buildId=7930" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/build/Builds/7930" }
+        },
+        "id": 7930,
+        "name": "9.0.2.7930"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 12,
+      "agentDelays": [],
+      "orchestrationId": "e3e6358sadsadsae-0045-4d74-84db-5fd7dbaf4ed8_df143ba0-1c7a-5b21-02e1-d41a394e29c9"
+    },
+    {
+      "requestId": 12620,
+      "queueTime": "2018-11-27T11:49:41.1233333Z",
+      "assignTime": "2018-11-27T11:49:41.1533333Z",
+      "receiveTime": "2018-11-27T11:49:45.1693788Z",
+      "finishTime": "2018-11-27T11:51:02.7633333Z",
+      "result": "succeeded",
+      "serviceOwner": "12345678-0000-8888-8000-000000000000",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-5f3c-4cf4-a7b7-43adc4eee405",
+      "planType": "Release",
+      "planId": "12345678-aea4-4249-a436-199e31ab75c1",
+      "jobId": "12345678-1788-4b13-81e4-8d7d7f31cfa3",
+      "demands": [ "Agent.Version -gtVersion 2.120.0" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/15" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=15" }
+        },
+        "id": 15,
+        "name": "vstsagent000001",
+        "version": "2.140.2",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_release?definitionId=1" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/Release/definitions/1" }
+        },
+        "id": 1,
+        "name": "Deploy release"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_release?releaseId=103&_a=release-summary" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/Release/releases/103" }
+        },
+        "id": 270,
+        "name": "Release-103 / Deploy"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 12,
+      "agentDelays": [],
+      "orchestrationId": "8fc62f92aea44249a4asdasdasdasdasdasd36199e31ab75c1_4cb5148117884b1381e48d7d7f31cfa3"
+    },
+    {
+      "requestId": 12615,
+      "queueTime": "2018-11-27T11:34:54.03Z",
+      "assignTime": "2018-11-27T11:34:54.7Z",
+      "receiveTime": "2018-11-27T11:34:57.6340669Z",
+      "finishTime": "2018-11-27T11:38:39.3702451Z",
+      "result": "succeeded",
+      "serviceOwner": "12345678-6065-48ca-87d9-7f5672854ef7",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-5f3c-4cf4-a7b7-43adc4eee405",
+      "planType": "Build",
+      "planId": "12345678-4444-450e-bb88-617106e01869",
+      "jobId": "12345678-1c7a-5b21-02e1-d41a394e29c9",
+      "demands": [ "msbuild", "visualstudio", "vstest", "java", "Agent.Version -gtVersion 2.119.1" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/15" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=15" }
+        },
+        "id": 15,
+        "name": "vstsagent000001",
+        "version": "2.140.2",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_build/definition?definitionId=22" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/build/Definitions/22" }
+        },
+        "id": 22,
+        "name": "Analyze PR"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_build/results?buildId=7922" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-5f3c-4cf4-a7b7-43adc4eee405/_apis/build/Builds/7922" }
+        },
+        "id": 7922,
+        "name": "7922"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 12,
+      "agentDelays": [],
+      "orchestrationId": "9a6a0084-4444-450easdasdasdasd-bb88-617106e01869_df143ba0-1c7a-5b21-02e1-d41a394e29c9"
+    },
+    {
+      "requestId": 12628,
+      "queueTime": "2018-11-27T14:37:19.4466667Z",
+      "assignTime": "2018-11-27T14:37:20.45Z",
+      "receiveTime": "2018-11-27T14:37:28.469178Z",
+      "lockedUntil": "2018-11-27T15:22:20.4691749Z",
+      "serviceOwner": "12345678-6065-48ca-87d9-7f5672854ef7",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-8414-44a1-8618-76d1870aa577",
+      "planType": "Build",
+      "planId": "12345678-c0c6-4e10-bfd0-c1b518a399f7",
+      "jobId": "12345678-1c7a-5b21-02e1-d41a394e29c9",
+      "demands": [ "Agent.Version -gtVersion 2.115.0" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/4/agents/3" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=4&agentId=3" }
+        },
+        "id": 3,
+        "name": "Agent",
+        "version": "2.141.1",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-8414-44a1-8618-76d1870aa577/_build/definition?definitionId=10" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-8414-44a1-8618-76d1870aa577/_apis/build/Definitions/10" }
+        },
+        "id": 10,
+        "name": "GitHub"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/12345678-8414-44a1-8618-76d1870aa577/_build/results?buildId=7931" },
+          "self": { "href": "https://testOrganization.visualstudio.com/12345678-8414-44a1-8618-76d1870aa577/_apis/build/Builds/7931" }
+        },
+        "id": 7931,
+        "name": "1.0.20181127.3"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 4,
+      "agentDelays": [],
+      "orchestrationId": "123141-c0c6-4e10-bfd0-c1b518a399f7_df143ba0-1c7a-5b21-02e1-d41a394e29c9"
+    },
+    {
+      "requestId": 12322,
+      "queueTime": "2018-11-22T07:34:23.6966667Z",
+      "assignTime": "2018-11-22T07:34:23.7433333Z",
+      "receiveTime": "2018-11-22T07:34:31.9456671Z",
+      "finishTime": "2018-11-22T07:36:53.18Z",
+      "result": "failed",
+      "serviceOwner": "0000000d-0000-8888-8000-000000000000",
+      "hostId": "12345678-cf20-4e24-866e-b973c13cfc2d",
+      "scopeId": "12345678-8414-44a1-8618-76d1870aa577",
+      "planType": "Release",
+      "planId": "12345678-de9a-4070-9042-ed65f2a6e36f",
+      "jobId": "12345678-78a9-4721-8856-cd3c71da116b",
+      "demands": [ "Agent.Version -gtVersion 2.119.0" ],
+      "reservedAgent": {
+        "_links": {
+          "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/4/agents/3" },
+          "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=4&agentId=3" }
+        },
+        "id": 3,
+        "name": "Hosted Agent",
+        "version": "2.141.1",
+        "osDescription": "Microsoft Windows 10.0.14393",
+        "enabled": true,
+        "status": "online",
+        "provisioningState": "Provisioned",
+        "accessPoint": "VstsAccessMapping"
+      },
+      "definition": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/48835459-8414-44a1-8618-76d1870aa577/_release?definitionId=1" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/48835459-8414-44a1-8618-76d1870aa577/_apis/Release/definitions/1" }
+        },
+        "id": 1,
+        "name": "release"
+      },
+      "owner": {
+        "_links": {
+          "web": { "href": "https://testOrganization.visualstudio.com/48835459-8414-44a1-8618-76d1870aa577/_release?releaseId=448&_a=release-summary" },
+          "self": { "href": "https://testOrganization.vsrm.visualstudio.com/48835459-8414-44a1-8618-76d1870aa577/_apis/Release/releases/448" }
+        },
+        "id": 1022,
+        "name": "Release-344"
+      },
+      "data": { "ParallelismTag": "Private" },
+      "poolId": 4,
+      "agentDelays": [],
+      "orchestrationId": "fd9ccde5de9a40sadsadsad709042ed65f2a6e36f_3738130278a947218856cd3c71da116b"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "count": 4,
+  "value": [
+    {
+      "_links": {
+        "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/15" },
+        "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=15" }
+      },
+      "maxParallelism": 1,
+      "createdOn": "2018-10-04T12:39:46.81Z",
+      "authorization": {
+        "clientId": "E4521B4F-8E22-4BF8-A1C3-4257E895037C",
+        "publicKey": {
+          "exponent": "test",
+          "modulus": "1"
+        }
+      },
+      "id": 15,
+      "name": "vstsagent000001",
+      "version": "2.140.2",
+      "osDescription": "Microsoft Windows 10.0.14393",
+      "enabled": true,
+      "status": "online",
+      "provisioningState": "Provisioned",
+      "accessPoint": "VstsAccessMapping"
+    },
+    {
+      "_links": {
+        "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/16" },
+        "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=16" }
+      },
+      "maxParallelism": 1,
+      "createdOn": "2018-10-11T06:55:30.66Z",
+      "authorization": {
+        "clientId": "E4521B4F-8E22-4BF8-A1C3-4257E895037C",
+        "publicKey": {
+          "exponent": "test",
+          "modulus": "2"
+        }
+      },
+      "id": 16,
+      "name": "vstsagent000002",
+      "version": "2.140.2",
+      "osDescription": "Microsoft Windows 10.0.14393",
+      "enabled": true,
+      "status": "online",
+      "provisioningState": "Provisioned",
+      "accessPoint": "VstsAccessMapping"
+    },
+    {
+      "_links": {
+        "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/17" },
+        "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=17" }
+      },
+      "maxParallelism": 1,
+      "createdOn": "2018-10-11T06:55:30.817Z",
+      "authorization": {
+        "clientId": "E4521B4F-8E22-4BF8-A1C3-4257E895037C",
+        "publicKey": {
+          "exponent": "test",
+          "modulus": "3"
+        }
+      },
+      "id": 17,
+      "name": "vstsagent000004",
+      "version": "2.140.2",
+      "osDescription": "Microsoft Windows 10.0.14393",
+      "enabled": true,
+      "status": "online",
+      "provisioningState": "Provisioned",
+      "accessPoint": "VstsAccessMapping"
+    },
+    {
+      "_links": {
+        "self": { "href": "https://dev.azure.com/testOrganization/_apis/distributedtask/pools/12/agents/18" },
+        "web": { "href": "https://dev.azure.com/testOrganization/_admin/_AgentPool#_a=agents&poolId=12&agentId=18" }
+      },
+      "maxParallelism": 1,
+      "createdOn": "2018-10-11T06:55:55.05Z",
+      "authorization": {
+        "clientId": "E4521B4F-8E22-4BF8-A1C3-4257E895037C",
+        "publicKey": {
+          "exponent": "test",
+          "modulus": "4"
+        }
+      },
+      "id": 18,
+      "name": "vstsagent000003",
+      "version": "2.140.2",
+      "osDescription": "Microsoft Windows 10.0.14393",
+      "enabled": true,
+      "status": "offline",
+      "provisioningState": "Provisioned",
+      "accessPoint": "VstsAccessMapping"
+    }
+  ]
+}
