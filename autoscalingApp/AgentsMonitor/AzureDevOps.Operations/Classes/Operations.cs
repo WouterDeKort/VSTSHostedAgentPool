@@ -1,11 +1,10 @@
-﻿using System;
-using System.Configuration;
-using System.Web.Configuration;
-using AzureDevOps.Operations.Helpers;
+﻿using AzureDevOps.Operations.Helpers;
 using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
+using System;
+using System.Configuration;
 
 namespace AzureDevOps.Operations.Classes
 {
@@ -40,6 +39,11 @@ namespace AzureDevOps.Operations.Classes
             var resourceGroupName = ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
             var vmssName = ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
             var vmss = azure.VirtualMachineScaleSets.GetByResourceGroup(resourceGroupName, vmssName);
+
+            //foreach (var vmssVm in vmss.VirtualMachines.List())
+            //{
+            //    vmssVm.Deallocate();
+            //}
         }
 
         private static AzureCredentials AzureCreds()
