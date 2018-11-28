@@ -48,6 +48,7 @@
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\Operations.cs" />
     <Compile Include="Classes\Retrieve.cs" />
+    <Compile Include="Helpers\Decisions.cs" />
     <Compile Include="Helpers\GetData.cs" />
     <Compile Include="Models\AgentPools.cs" />
     <Compile Include="Models\Agents.cs" />
