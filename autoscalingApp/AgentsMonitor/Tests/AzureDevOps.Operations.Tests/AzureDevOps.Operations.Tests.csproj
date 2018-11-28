@@ -62,6 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Data\TestData\Agents\allAgents.json" />
     <None Include="Data\TestData\GetPoolId\pools-fail.json" />
     <None Include="Data\TestData\GetPoolId\pools-success.json" />

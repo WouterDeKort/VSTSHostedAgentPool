@@ -21,8 +21,16 @@ namespace AutoScaler
                 Environment.Exit(Constants.ErrorExitCode);
             }
 
-            ExitIfSettingEmpty(ConfigurationManager.AppSettings[Constants.AzureDevOpsInstanceSettingName], "Azure DevOps instance name");
-            ExitIfSettingEmpty(ConfigurationManager.AppSettings[Constants.AzureDevOpsPatSettingName], "Azure DevOps PAT");
+            ExitIfSettingEmpty(Constants.AzureDevOpsInstanceSettingName, "Azure DevOps instance name");
+            ExitIfSettingEmpty(Constants.AzureDevOpsPatSettingName, "Azure DevOps PAT");
+            //Azure service principle settings
+            ExitIfSettingEmpty(Constants.AzureServicePrincipleClientIdSettingName, "Azure Service Principle client ID");
+            ExitIfSettingEmpty(Constants.AzureServicePrincipleClientSecretSettingName, "Azure Service Principle client secret");
+            ExitIfSettingEmpty(Constants.AzureServicePrincipleTenantIdSettingName, "Azure Service Principle tenant id");
+            //azure vmss data
+            ExitIfSettingEmpty(Constants.AzureSubscriptionIdSettingName, "Azure Subscription id");
+            ExitIfSettingEmpty(Constants.AzureVmssResourceGroupSettingName, "Azure VMSS RG Name");
+            ExitIfSettingEmpty(Constants.AzureVmssNameSettingName, "Azure VMSS Name");
         }
 
         /// <summary>
