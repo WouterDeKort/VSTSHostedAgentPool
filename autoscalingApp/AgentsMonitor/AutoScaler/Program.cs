@@ -79,13 +79,6 @@ namespace AutoScaler
                 onlineAgentsCount = (int) countNullable.Value;
             }
 
-            if (onlineAgentsCount == maxAgentsCount)
-            {
-                //we could not add anything more in here
-                Console.WriteLine("We have maximum agents assigned, could not do anything more");
-                Environment.Exit(Constants.SuccessExitCode);
-            }
-
             var waitingJobsCount = dataRetriever.GetCurrentJobsRunning(poolId);
 
             if (waitingJobsCount == onlineAgentsCount)
@@ -94,15 +87,7 @@ namespace AutoScaler
                 Environment.Exit(Constants.SuccessExitCode);
             }
 
-            if (waitingJobsCount < onlineAgentsCount)
-            {
-                //downscale agent pool, but keep 1 agent running for 1 hour more
-            }
-
-            if (waitingJobsCount > onlineAgentsCount)
-            {
-                //add more agents, but not more than allowed
-            }
+            Operations.WorkWithVmss(waitingJobsCount, onlineAgentsCount, maxAgentsCount);
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿using System.IO;
-using System.Net.Http;
-using AzureDevOps.Operations.Classes;
+﻿using AzureDevOps.Operations.Classes;
 using AzureDevOps.Operations.Tests.Data;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
+using System.IO;
 
 namespace AzureDevOps.Operations.Tests.Classes
 {
@@ -61,7 +60,7 @@ namespace AzureDevOps.Operations.Tests.Classes
             var mockHttp = new MockHttpMessageHandler();
 
             var jsonPathCombined = Path.Combine(System.AppContext.BaseDirectory, jsonPathResponse);
-            
+
             var response = File.Exists(jsonPathCombined) ? File.ReadAllText(jsonPathCombined) : string.Empty;
 
             var request = mockHttp.When("*").Respond("application/json", response);

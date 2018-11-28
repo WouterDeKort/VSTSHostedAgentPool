@@ -90,6 +90,7 @@ namespace AzureDevOps.Operations.Classes
         /// <returns></returns>
         public int GetAllAccessibleAgents(int agentsPoolId)
         {
+            //gets agents in all statuses assigned to pool; maybe need to check VMSS size instead??
             var allAgents = GetAllAgentsRunningNow(agentsPoolId);
             if (allAgents?.Count != null)
             {
