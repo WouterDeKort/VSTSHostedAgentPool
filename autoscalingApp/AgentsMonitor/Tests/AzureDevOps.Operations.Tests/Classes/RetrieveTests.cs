@@ -46,11 +46,12 @@ namespace AzureDevOps.Operations.Tests.Classes
 
         [TestCase(@"..\..\Data\TestData\JobRequests\jobs-0-running.json", 0, Description = "There is 0 jobs running according to test JSON")]
         [TestCase(@"..\..\Data\TestData\JobRequests\jobs-1-running.json", 1, Description = "There is 1 job running according to test JSON")]
+        [TestCase(@".", 0, Description = "Could not retrieve JSON")]
         public void CheckJobsRetrieval(string jsonPath, int runningJobs)
         {
             var dataRetriever = CreateRetriever(jsonPath);
 
-            var jobsRunning = dataRetriever.GetCurrentJobsRunning(TestsConstants.TestPoolId);
+            var jobsRunning = dataRetriever.GetCurrentJobsRunningCount(TestsConstants.TestPoolId);
 
             Assert.AreEqual(jobsRunning, runningJobs);
         }

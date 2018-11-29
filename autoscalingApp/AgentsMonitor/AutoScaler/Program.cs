@@ -79,7 +79,7 @@ namespace AutoScaler
                 onlineAgentsCount = (int) countNullable.Value;
             }
 
-            var waitingJobsCount = dataRetriever.GetCurrentJobsRunning(poolId);
+            var waitingJobsCount = dataRetriever.GetCurrentJobsRunningCount(poolId);
 
             if (waitingJobsCount == onlineAgentsCount)
             {
@@ -87,7 +87,7 @@ namespace AutoScaler
                 Environment.Exit(Constants.SuccessExitCode);
             }
 
-            Operations.WorkWithVmss(waitingJobsCount, onlineAgentsCount, maxAgentsCount);
+            Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount, dataRetriever, poolId);
         }
     }
 }

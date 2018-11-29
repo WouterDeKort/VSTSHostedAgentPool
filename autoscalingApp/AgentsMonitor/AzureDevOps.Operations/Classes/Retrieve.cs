@@ -12,15 +12,16 @@ namespace AzureDevOps.Operations.Classes
         /// Organization agentsPoolName in Azure DevOps
         /// </summary>
         private string AzureDevOpsOrganizationName { get; }
+
         /// <summary>
         /// PAT (Personal Access Token) to access Azure DevOps
         /// </summary>
         private string AzureDevOpsPersonalAccessToken { get; }
+
         /// <summary>
         /// Needed for mocking and testing
         /// </summary>
         private readonly HttpClient _localHttpClient;
-
 
         public Retrieve(string orgName, string token, HttpClient httpClient)
         {
@@ -100,20 +101,34 @@ namespace AzureDevOps.Operations.Classes
             return 0;
         }
 
-        public int GetCurrentJobsRunning(int agentsPoolId)
+        /// <summary>
+        /// Gets count of current running jobs (where result is null)
+        /// </summary>
+        /// <param name="agentsPoolId"></param>
+        /// <returns></returns>
+        public int GetCurrentJobsRunningCount(int agentsPoolId)
         {
-            var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/jobrequests";
-
-            var allJobsRequests = GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken, _localHttpClient);
+            var allJobsRequests = GetRuningJobs(agentsPoolId);
 
             //count amount of jobs without result - they are running
-            return allJobsRequests?.AllJobRequests.Count(jobRequest => jobRequest.Result == null) ?? 0;
+            return allJobsRequests?.Length ?? 0;
         }
 
         private Agents GetAllAgentsRunningNow(int agentsPoolId)
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/agents";
             return GetData.DownloadSerializedJsonData<Agents>(url, AzureDevOpsPersonalAccessToken, _localHttpClient);
+        }
+
+        /// <summary>
+        /// Gets actually running now jobs
+        /// </summary>
+        /// <param name="agentsPoolId"></param>
+        /// <returns></returns>
+        internal JobRequest[] GetRuningJobs(int agentsPoolId)
+        {
+            var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/jobrequests";
+            return GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken, _localHttpClient)?.AllJobRequests?.Where(x => x.Result == null).ToArray();
         }
     }
 }

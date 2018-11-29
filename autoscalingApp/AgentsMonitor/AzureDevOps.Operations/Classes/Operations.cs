@@ -16,17 +16,10 @@ namespace AzureDevOps.Operations.Classes
         /// <param name="waitingJobs"></param>
         /// <param name="onlineAgents"></param>
         /// <param name="maxAgentsInPool"></param>
-        public static void WorkWithVmss(int waitingJobs, int onlineAgents, int maxAgentsInPool)
+        /// <param name="dataRetriever">Used to get data from Azure DevOps</param>
+        /// <param name="agentsPoolId"></param>
+        public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool, Retrieve dataRetriever, int agentsPoolId)
         {
-            var addMoreAgents = Decisions.AddMoreAgents(waitingJobs, onlineAgents);
-            var amountOfAgents = Decisions.HowMuchAgents(waitingJobs, onlineAgents, maxAgentsInPool);
-
-            if (amountOfAgents == 0)
-            {
-                //nevertheless - should we (de)provision agents: we are at boundaries
-                Environment.Exit(Constants.SuccessExitCode);
-            }
-
             var credentials = AzureCreds();
 
             var azure = Azure
@@ -39,6 +32,17 @@ namespace AzureDevOps.Operations.Classes
             var resourceGroupName = ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
             var vmssName = ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
             var vmss = azure.VirtualMachineScaleSets.GetByResourceGroup(resourceGroupName, vmssName);
+            //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
+            var currentJobs = dataRetriever.GetRuningJobs(agentsPoolId);
+            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
+            var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
+
+            if (amountOfAgents == 0)
+            {
+                //nevertheless - should we (de)provision agents: we are at boundaries
+                Environment.Exit(Constants.SuccessExitCode);
+            }
+
 
             //foreach (var vmssVm in vmss.VirtualMachines.List())
             //{
