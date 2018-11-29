@@ -84,7 +84,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <Content Include="settings.job" />
+    <Content Include="settings.job">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzureDevOps.Operations\AzureDevOps.Operations.csproj">
