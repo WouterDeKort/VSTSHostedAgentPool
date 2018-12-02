@@ -125,7 +125,7 @@ namespace AzureDevOps.Operations.Classes
         /// </summary>
         /// <param name="agentsPoolId"></param>
         /// <returns></returns>
-        internal JobRequest[] GetRuningJobs(int agentsPoolId)
+        public JobRequest[] GetRuningJobs(int agentsPoolId)
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/jobrequests";
             return GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken, _localHttpClient)?.AllJobRequests?.Where(x => x.Result == null).ToArray();

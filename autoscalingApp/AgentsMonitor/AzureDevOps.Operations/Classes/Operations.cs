@@ -4,7 +4,11 @@ using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
+using AzureDevOps.Operations.Models;
+using Microsoft.Azure.Management.Compute.Fluent;
 
 namespace AzureDevOps.Operations.Classes
 {
@@ -43,11 +47,40 @@ namespace AzureDevOps.Operations.Classes
                 Environment.Exit(Constants.SuccessExitCode);
             }
 
+            var virtualMachines = vmss.VirtualMachines.List()
+                .Select(vmssVm => new ScaleSetVirtualMachineStripped
+                {
+                    VmInstanceId = vmssVm.InstanceId, 
+                    VmName = vmssVm.ComputerName,
+                    VmInstanceState = vmssVm.PowerState
+                }).ToList();
 
-            //foreach (var vmssVm in vmss.VirtualMachines.List())
-            //{
-            //    vmssVm.Deallocate();
-            //}
+            if (!addMoreAgents)
+            {
+                //TODO: Record deallocation; check, if it is just last VM -> postpone it's deallocation for 1 hour then
+                Console.WriteLine("Deallocating VMs");
+                //we need to downscale
+                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines, currentJobs);
+
+                foreach (var instanceId in instanceIdCollection)
+                {
+                    Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
+                    vmss.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(resourceGroupName, vmssName,
+                        instanceId);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Starting more VMs");
+                foreach (var scaleSetVirtualMachineStripped in virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
+                {
+                    //TODO: Record starting VM
+                    Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
+                    vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
+                        scaleSetVirtualMachineStripped.VmInstanceId);
+                }
+            }
+            Console.WriteLine("Finished execution");
         }
 
         private static AzureCredentials AzureCreds()

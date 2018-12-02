@@ -1,4 +1,8 @@
-﻿using AzureDevOps.Operations.Helpers;
+﻿using System.Collections.Generic;
+using AzureDevOps.Operations.Helpers;
+using AzureDevOps.Operations.Models;
+using AzureDevOps.Operations.Tests.Classes;
+using AzureDevOps.Operations.Tests.Data;
 using NUnit.Framework;
 
 namespace AzureDevOps.Operations.Tests.Helpers
@@ -24,6 +28,70 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var amount = Decisions.HowMuchAgents(jobsCount, agentsCount, maxAgentsCount);
            
             Assert.AreEqual(amount, expectedAmount);
+        }
+
+        [Test]
+        public static void TestInstanceIdRetrieval_agent_is_there()
+        {
+            var testValid = new ScaleSetVirtualMachineStripped
+            {
+                VmName = "Agent",
+                VmInstanceId = "205"
+            };
+
+            var testArray = new ScaleSetVirtualMachineStripped[1];
+            testArray[0] = testValid;
+
+            var vmScaleSetData = GetTestData(10, testArray);
+            var instanceIds = GetInstanceIds(vmScaleSetData);
+            Assert.IsTrue(instanceIds.Length.Equals(1));
+            Assert.IsTrue(instanceIds[0].Equals(testValid.VmInstanceId));
+        }
+
+        [Test]
+        public static void TestInstanceIdRetrieval_agent_is_not_there()
+        {
+            var vmScaleSetData = GetTestData(10);
+            
+            var instanceIds = GetInstanceIds(vmScaleSetData);
+            Assert.IsTrue(instanceIds.Length.Equals(0));
+        }
+
+        [Test]
+        public static void TestInstanceIdRetrieval_no_jobs_retrieved()
+        {
+            var vmScaleSetData = GetTestData(10);
+            
+            var instanceIds = GetInstanceIds(vmScaleSetData, 1);
+            Assert.IsTrue(instanceIds.Length.Equals(0));
+        }
+
+        private static string[] GetInstanceIds(List<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId)
+        {
+            var dataRetriever = RetrieveTests.CreateRetriever(TestsConstants.Json1JobIsRunning);
+            return Decisions.CollectInstanceIdsToDeallocate(vmScaleSetData,
+                dataRetriever.GetRuningJobs(poolId));
+        }
+
+        private static List<ScaleSetVirtualMachineStripped> GetTestData(int testListSize, ScaleSetVirtualMachineStripped[] addedData = null)
+        {
+            var vmScaleSetData = new List<ScaleSetVirtualMachineStripped>();
+            if (addedData != null)
+            {
+                vmScaleSetData.AddRange(addedData);
+            }
+            
+            for (var counter = 0; counter < testListSize; counter++)
+            {
+                vmScaleSetData.Add(new ScaleSetVirtualMachineStripped
+                {
+                    VmName = $"vm{counter}",
+                    VmInstanceId = $"{counter}"
+                });
+            }
+
+            return vmScaleSetData;
+
         }
     }
 }

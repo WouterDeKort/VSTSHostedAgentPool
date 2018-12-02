@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AzureDevOps.Operations.Models;
 
 namespace AzureDevOps.Operations.Helpers
 {
@@ -24,6 +27,23 @@ namespace AzureDevOps.Operations.Helpers
                 return 0;
             }
             return Math.Abs(runningJobs - agentsCount);
+        }
+
+        public static string[] CollectInstanceIdsToDeallocate(List<ScaleSetVirtualMachineStripped>vmScaleSetStrippedDictionary, JobRequest[] jobRequests)
+        {
+            if (!jobRequests.Any())
+            {
+                //nothing retrieved from jobs
+                return new[] { string.Empty };
+            }
+
+            var instanceIdCollection = (from vmssVm in vmScaleSetStrippedDictionary 
+                let vmName = vmssVm.VmName 
+                let vmInstanceId = vmssVm.VmInstanceId
+                where jobRequests.Any(job => job.ReservedAgent.Name.Equals(vmName, StringComparison.OrdinalIgnoreCase))
+                select vmInstanceId).ToArray();
+
+            return instanceIdCollection;
         }
     }
 }

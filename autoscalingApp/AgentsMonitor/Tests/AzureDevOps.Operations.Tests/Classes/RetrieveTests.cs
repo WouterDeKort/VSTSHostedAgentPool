@@ -20,7 +20,7 @@ namespace AzureDevOps.Operations.Tests.Classes
         }
 
         [TestCase(@"..\..\Data\TestData\GetPoolId\pools-fail.json", Description = "There is no pool with required name")]
-        [TestCase(@"\fileNotExists", Description = "Response was with status 200, but empty")]
+        [TestCase(TestsConstants.FileNotExistPointer, Description = "Response was with status 200, but empty")]
         public void GetPoolIdTest_Pool_Not_Present(string jsonPath)
         {
             var dataRetriever = CreateRetriever(jsonPath);
@@ -45,8 +45,8 @@ namespace AzureDevOps.Operations.Tests.Classes
         }
 
         [TestCase(@"..\..\Data\TestData\JobRequests\jobs-0-running.json", 0, Description = "There is 0 jobs running according to test JSON")]
-        [TestCase(@"..\..\Data\TestData\JobRequests\jobs-1-running.json", 1, Description = "There is 1 job running according to test JSON")]
-        [TestCase(@".", 0, Description = "Could not retrieve JSON")]
+        [TestCase(TestsConstants.Json1JobIsRunning, 1, Description = "There is 1 job running according to test JSON")]
+        [TestCase(TestsConstants.FileNotExistPointer, 0, Description = "Response was with status 200, but empty")]
         public void CheckJobsRetrieval(string jsonPath, int runningJobs)
         {
             var dataRetriever = CreateRetriever(jsonPath);
@@ -56,7 +56,7 @@ namespace AzureDevOps.Operations.Tests.Classes
             Assert.AreEqual(jobsRunning, runningJobs);
         }
 
-        private static Retrieve CreateRetriever(string jsonPathResponse)
+        internal static Retrieve CreateRetriever(string jsonPathResponse)
         {
             var mockHttp = new MockHttpMessageHandler();
 

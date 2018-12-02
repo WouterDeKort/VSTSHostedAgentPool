@@ -88,6 +88,7 @@ namespace AutoScaler
             }
 
             Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount, dataRetriever, poolId);
+            Environment.Exit(Constants.SuccessExitCode);
         }
     }
 }
