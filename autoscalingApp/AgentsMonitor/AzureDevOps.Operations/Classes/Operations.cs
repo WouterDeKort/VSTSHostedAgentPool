@@ -75,11 +75,11 @@ namespace AzureDevOps.Operations.Classes
             }
             else
             {
-                var vmsCounter = 0;
+                var virtualMachinesCounter = 0;
                 Console.WriteLine("Starting more VMs");
                 foreach (var scaleSetVirtualMachineStripped in virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
                 {
-                    if (vmsCounter >= amountOfAgents)
+                    if (virtualMachinesCounter >= amountOfAgents)
                     {
                         break;
                     }
@@ -90,7 +90,7 @@ namespace AzureDevOps.Operations.Classes
                         vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
                             scaleSetVirtualMachineStripped.VmInstanceId);
                     }
-                    vmsCounter++;
+                    virtualMachinesCounter++;
                 }
             }
             Console.WriteLine("Finished execution");

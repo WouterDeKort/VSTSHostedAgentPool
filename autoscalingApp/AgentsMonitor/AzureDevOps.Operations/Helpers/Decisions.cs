@@ -15,7 +15,6 @@ namespace AzureDevOps.Operations.Helpers
         /// <returns></returns>
         public static bool AddMoreAgents(int runningJobs, int agentsCount)
         {
-            //that's a stub, which shall change in future, to take into account situation, when there is just one agent running
             return runningJobs > agentsCount;
         }
 
