@@ -169,6 +169,7 @@
     <Compile Include="Classes\Retrieve.cs" />
     <Compile Include="Helpers\Decisions.cs" />
     <Compile Include="Helpers\GetData.cs" />
+    <Compile Include="Helpers\GetTypedSetting.cs" />
     <Compile Include="Models\AgentPools.cs" />
     <Compile Include="Models\Agents.cs" />
     <Compile Include="Models\JobRequests.cs" />

@@ -50,5 +50,9 @@
         /// Defines VMSS name
         /// </summary>
         public const string AzureVmssNameSettingName = "Azure.VMSS.Name";
+        /// <summary>
+        /// Defines if we are executing test run (so, no actual changes will be done to VMSS agents
+        /// </summary>
+        public const string DryRunSettingName = "DryRunExecution";
     }
 }

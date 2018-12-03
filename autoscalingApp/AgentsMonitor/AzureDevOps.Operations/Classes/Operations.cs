@@ -54,6 +54,8 @@ namespace AzureDevOps.Operations.Classes
                 Environment.Exit(Constants.SuccessExitCode);
             }
 
+            var isDryRun = GetTypedSetting.GetSetting<bool>(Constants.DryRunSettingName);
+
             if (!addMoreAgents)
             {
                 //TODO: Record deallocation
@@ -64,8 +66,11 @@ namespace AzureDevOps.Operations.Classes
                 foreach (var instanceId in instanceIdCollection)
                 {
                     Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
-                    vmss.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(resourceGroupName, vmssName,
-                        instanceId);
+                    if (!isDryRun)
+                    {
+                        vmss.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(resourceGroupName, vmssName,
+                            instanceId);
+                    }
                 }
             }
             else
@@ -80,8 +85,11 @@ namespace AzureDevOps.Operations.Classes
                     }
                     //TODO: Record starting VM
                     Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
-                    vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
-                        scaleSetVirtualMachineStripped.VmInstanceId);
+                    if (!isDryRun)
+                    {
+                        vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
+                            scaleSetVirtualMachineStripped.VmInstanceId);
+                    }
                     vmsCounter++;
                 }
             }
