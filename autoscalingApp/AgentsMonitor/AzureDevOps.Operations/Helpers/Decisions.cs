@@ -26,7 +26,10 @@ namespace AzureDevOps.Operations.Helpers
                 //there is more jobs than we could have agents deployed
                 return 0;
             }
-            return Math.Abs(runningJobs - agentsCount);
+
+            var amountOfAgents = Math.Abs(runningJobs - agentsCount);
+
+            return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 
         public static string[] CollectInstanceIdsToDeallocate(List<ScaleSetVirtualMachineStripped>vmScaleSetStrippedDictionary, JobRequest[] jobRequests)

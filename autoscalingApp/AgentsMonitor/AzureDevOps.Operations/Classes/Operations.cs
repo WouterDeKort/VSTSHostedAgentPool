@@ -17,7 +17,6 @@ namespace AzureDevOps.Operations.Classes
         /// <summary>
         /// Here we will proceed working with VMSS ((de)provision additional agents, keep current agents count)
         /// </summary>
-        /// <param name="waitingJobs"></param>
         /// <param name="onlineAgents"></param>
         /// <param name="maxAgentsInPool"></param>
         /// <param name="dataRetriever">Used to get data from Azure DevOps</param>
@@ -36,6 +35,13 @@ namespace AzureDevOps.Operations.Classes
             var resourceGroupName = ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
             var vmssName = ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
             var vmss = azure.VirtualMachineScaleSets.GetByResourceGroup(resourceGroupName, vmssName);
+            var virtualMachines = vmss.VirtualMachines.List()
+                .Select(vmssVm => new ScaleSetVirtualMachineStripped
+                {
+                    VmInstanceId = vmssVm.InstanceId, 
+                    VmName = vmssVm.ComputerName,
+                    VmInstanceState = vmssVm.PowerState
+                }).ToList();
             //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
             var currentJobs = dataRetriever.GetRuningJobs(agentsPoolId);
             var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
@@ -44,20 +50,13 @@ namespace AzureDevOps.Operations.Classes
             if (amountOfAgents == 0)
             {
                 //nevertheless - should we (de)provision agents: we are at boundaries
+                Console.WriteLine("Could not add/remove more agents, exiting...");
                 Environment.Exit(Constants.SuccessExitCode);
             }
 
-            var virtualMachines = vmss.VirtualMachines.List()
-                .Select(vmssVm => new ScaleSetVirtualMachineStripped
-                {
-                    VmInstanceId = vmssVm.InstanceId, 
-                    VmName = vmssVm.ComputerName,
-                    VmInstanceState = vmssVm.PowerState
-                }).ToList();
-
             if (!addMoreAgents)
             {
-                //TODO: Record deallocation; check, if it is just last VM -> postpone it's deallocation for 1 hour then
+                //TODO: Record deallocation
                 Console.WriteLine("Deallocating VMs");
                 //we need to downscale
                 var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines, currentJobs);
@@ -71,13 +70,19 @@ namespace AzureDevOps.Operations.Classes
             }
             else
             {
+                var vmsCounter = 0;
                 Console.WriteLine("Starting more VMs");
                 foreach (var scaleSetVirtualMachineStripped in virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
                 {
+                    if (vmsCounter >= amountOfAgents)
+                    {
+                        break;
+                    }
                     //TODO: Record starting VM
                     Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
                     vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
                         scaleSetVirtualMachineStripped.VmInstanceId);
+                    vmsCounter++;
                 }
             }
             Console.WriteLine("Finished execution");
