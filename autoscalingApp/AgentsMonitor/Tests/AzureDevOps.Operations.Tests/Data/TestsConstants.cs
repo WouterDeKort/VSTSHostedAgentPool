@@ -12,8 +12,12 @@
 
         internal const string FileNotExistPointer = @"\fileNotExists";
         /// <summary>
-        /// Points to Json with 1 running job
+        /// Points to JSON with 1 running job
         /// </summary>
         internal const string Json1JobIsRunning = @"..\..\Data\TestData\JobRequests\jobs-1-running.json";
+        /// <summary>
+        /// Point to JSON with 3 running jobs
+        /// </summary>
+        internal const string Json3JobIsRunning = @"..\..\Data\TestData\JobRequests\jobs-3-running.json";
     }
 }

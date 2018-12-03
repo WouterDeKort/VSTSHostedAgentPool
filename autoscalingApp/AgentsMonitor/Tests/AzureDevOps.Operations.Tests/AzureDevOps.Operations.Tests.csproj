@@ -66,6 +66,7 @@
     <None Include="Data\TestData\Agents\allAgents.json" />
     <None Include="Data\TestData\GetPoolId\pools-fail.json" />
     <None Include="Data\TestData\GetPoolId\pools-success.json" />
+    <None Include="Data\TestData\JobRequests\jobs-3-running.json" />
     <None Include="Data\TestData\JobRequests\jobs-1-running.json" />
     <None Include="Data\TestData\JobRequests\jobs-0-running.json" />
     <None Include="packages.config" />

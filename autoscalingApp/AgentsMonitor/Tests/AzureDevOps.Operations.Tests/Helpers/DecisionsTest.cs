@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using AzureDevOps.Operations.Helpers;
+﻿using AzureDevOps.Operations.Helpers;
 using AzureDevOps.Operations.Models;
 using AzureDevOps.Operations.Tests.Classes;
 using AzureDevOps.Operations.Tests.Data;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace AzureDevOps.Operations.Tests.Helpers
 {
@@ -26,7 +26,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
         public static void AmountOfAgents(int jobsCount, int agentsCount, int maxAgentsCount, int expectedAmount)
         {
             var amount = Decisions.HowMuchAgents(jobsCount, agentsCount, maxAgentsCount);
-           
+
             Assert.AreEqual(amount, expectedAmount);
         }
 
@@ -49,10 +49,42 @@ namespace AzureDevOps.Operations.Tests.Helpers
         }
 
         [Test]
+        public static void TestInstanceIdRetrieval_agents_is_there()
+        {
+            var testArray = new ScaleSetVirtualMachineStripped[3];
+            var testValid = new ScaleSetVirtualMachineStripped
+            {
+                VmName = "Agent",
+                VmInstanceId = "205"
+            };
+
+            testArray[0] = testValid;
+            testValid = new ScaleSetVirtualMachineStripped
+            {
+                VmName = "Agent1",
+                VmInstanceId = "2052"
+            };
+
+            testArray[1] = testValid;
+            testValid = new ScaleSetVirtualMachineStripped
+            {
+                VmName = "Agent2",
+                VmInstanceId = "20522"
+            };
+
+            testArray[2] = testValid;
+
+            var vmScaleSetData = GetTestData(10, testArray);
+            var instanceIds = GetInstanceIds(vmScaleSetData, TestsConstants.TestPoolId, TestsConstants.Json3JobIsRunning);
+            Assert.IsTrue(instanceIds.Length.Equals(3));
+            Assert.IsTrue(instanceIds[0].Equals(testArray[0].VmInstanceId));
+        }
+
+        [Test]
         public static void TestInstanceIdRetrieval_agent_is_not_there()
         {
             var vmScaleSetData = GetTestData(10);
-            
+
             var instanceIds = GetInstanceIds(vmScaleSetData);
             Assert.IsTrue(instanceIds.Length.Equals(0));
         }
@@ -61,14 +93,14 @@ namespace AzureDevOps.Operations.Tests.Helpers
         public static void TestInstanceIdRetrieval_no_jobs_retrieved()
         {
             var vmScaleSetData = GetTestData(10);
-            
+
             var instanceIds = GetInstanceIds(vmScaleSetData, 1);
             Assert.IsTrue(instanceIds.Length.Equals(0));
         }
 
-        private static string[] GetInstanceIds(List<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId)
+        private static string[] GetInstanceIds(List<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
         {
-            var dataRetriever = RetrieveTests.CreateRetriever(TestsConstants.Json1JobIsRunning);
+            var dataRetriever = RetrieveTests.CreateRetriever(jsonData);
             return Decisions.CollectInstanceIdsToDeallocate(vmScaleSetData,
                 dataRetriever.GetRuningJobs(poolId));
         }
@@ -80,7 +112,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
             {
                 vmScaleSetData.AddRange(addedData);
             }
-            
+
             for (var counter = 0; counter < testListSize; counter++)
             {
                 vmScaleSetData.Add(new ScaleSetVirtualMachineStripped
