@@ -60,6 +60,20 @@
         "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
     },
+    "skuTier": {
+        "type": "string",
+        "defaultValue": "Shared",
+        "allowedValues": [
+          "Shared",
+          "Basic",
+          "Standard",
+          "Premium",
+          "PremiumV2"
+        ],
+        "metadata": {
+          "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+        }
+      },
     "http20State": {
       "type": "bool",
       "metadata": {
@@ -217,7 +231,8 @@
         "name": "[parameters('webAppServicePlanName')]"
       },
       "sku": {
-        "name": "[parameters('skuName')]"
+        "name": "[parameters('skuName')]",
+        "tier": "[parameters('skuTier')]"
       }
     },
     {
