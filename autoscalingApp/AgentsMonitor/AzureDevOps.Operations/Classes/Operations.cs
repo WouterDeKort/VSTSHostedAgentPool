@@ -53,7 +53,7 @@ namespace AzureDevOps.Operations.Classes
             {
                 //nevertheless - should we (de)provision agents: we are at boundaries
                 Console.WriteLine("Could not add/remove more agents, exiting...");
-                Environment.Exit(Constants.SuccessExitCode);
+                return;
             }
 
             var isDryRun = GetTypedSetting.GetSetting<bool>(Constants.DryRunSettingName);
@@ -65,7 +65,6 @@ namespace AzureDevOps.Operations.Classes
 
             if (!addMoreAgents)
             {
-                //TODO: Record deallocation
                 Console.WriteLine("Deallocating VMs");
                 //we need to downscale
                 var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines, currentJobs);
@@ -90,7 +89,6 @@ namespace AzureDevOps.Operations.Classes
                     {
                         break;
                     }
-                    //TODO: Record starting VM
                     Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
                     if (!isDryRun)
                     {

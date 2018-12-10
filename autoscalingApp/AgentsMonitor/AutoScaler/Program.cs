@@ -2,6 +2,7 @@
 using AzureDevOps.Operations.Classes;
 using Microsoft.Azure.WebJobs;
 using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 
@@ -21,6 +22,7 @@ namespace AutoScaler
             DefinitionChecker.CheckAllSettings();
 
             var config = new JobHostConfiguration();
+            config.UseTimers();
 
             if (config.IsDevelopment)
             {
@@ -28,11 +30,11 @@ namespace AutoScaler
             }
 
             var host = new JobHost(config);
-            host.Call(typeof(Program).GetMethod("CheckQueue"));
+            host.RunAndBlock();
         }
 
-        [NoAutomaticTrigger]
-        public static void CheckQueue()
+        [Singleton]
+        public static void RemindersFunction([TimerTrigger("0 */5 * * * *")] TimerInfo timerInfo, TextWriter log) 
         {
             var poolIdSetting = ConfigurationManager.AppSettings[Constants.AgentsPoolIdSettingName];
 
@@ -91,11 +93,10 @@ namespace AutoScaler
             if (waitingJobsCount == onlineAgentsCount)
             {
                 //nothing to do here
-                Environment.Exit(Constants.SuccessExitCode);
+                return;
             }
 
             Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount, dataRetriever, poolId);
-            Environment.Exit(Constants.SuccessExitCode);
         }
     }
 }
