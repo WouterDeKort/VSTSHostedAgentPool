@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 using AzureDevOps.Operations.Models;
 using Microsoft.Azure.Management.Compute.Fluent;
+using TableStorageClient.Models;
 
 namespace AzureDevOps.Operations.Classes
 {
@@ -55,6 +57,11 @@ namespace AzureDevOps.Operations.Classes
             }
 
             var isDryRun = GetTypedSetting.GetSetting<bool>(Constants.DryRunSettingName);
+
+#pragma warning disable 4014
+            //I wish this record to be processed on it's own; it is just tracking
+            RecordDataInTable(resourceGroupName, vmssName, addMoreAgents);
+#pragma warning restore 4014
 
             if (!addMoreAgents)
             {
@@ -103,6 +110,28 @@ namespace AzureDevOps.Operations.Classes
             var tenantId = ConfigurationManager.AppSettings[Constants.AzureServicePrincipleTenantIdSettingName];
             //maybe in future I'll need to extend this one to allow other then Global Azure environment
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
+        }
+
+        private static async Task RecordDataInTable(string rgName, string vmScaleSetName, bool isProvisioning)
+        {
+            var storageConnectionString = ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];
+
+            if (string.IsNullOrWhiteSpace(storageConnectionString))
+            {
+                Console.WriteLine("Connection string is not defined for Azure Storage");
+                //connection string for Azure Storage is not defined
+                return;
+            }
+
+            if (Properties.ActionsTrackingOperations == null)
+            {
+                Console.WriteLine($"Could not connect to Azure Storage Table {Properties.StorageTableName}");
+                return;
+            }
+
+            var entity = new ScaleEventEntity(rgName, vmScaleSetName) {IsProvisioningEvent = isProvisioning};
+
+            await Properties.ActionsTrackingOperations.InsertOrReplaceEntityAsync(entity);
         }
     }
 }

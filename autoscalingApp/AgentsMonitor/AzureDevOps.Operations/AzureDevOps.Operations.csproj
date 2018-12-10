@@ -170,6 +170,7 @@
     <Compile Include="Helpers\Decisions.cs" />
     <Compile Include="Helpers\GetData.cs" />
     <Compile Include="Helpers\GetTypedSetting.cs" />
+    <Compile Include="Helpers\Properties.cs" />
     <Compile Include="Models\AgentPools.cs" />
     <Compile Include="Models\Agents.cs" />
     <Compile Include="Models\JobRequests.cs" />
@@ -182,6 +183,11 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\TableStorageClient\TableStorageClient.csproj">
+      <Project>{0b44f66c-56c5-4495-a222-3867250f8648}</Project>
+      <Name>TableStorageClient</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
