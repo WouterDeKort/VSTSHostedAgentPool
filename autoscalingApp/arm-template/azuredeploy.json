@@ -1,0 +1,338 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS"
+      ]
+    },
+    "use32bitWorkerProcess": {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        true,
+        false
+      ],
+      "metadata": {
+        "description": "Appplication pool mode"
+      }
+    },
+    "enableAlwaysOn": {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        true,
+        false
+      ],
+      "metadata": {
+        "description": "AlwaysOn mode to enable autostart"
+      }
+    },
+    "environmentTag": { "type": "string" },
+    "platformTag": { "type": "string" },
+    "appTag": { "type": "string" },
+    "storageAccountName": {
+        "type": "string",
+        "defaultValue": "[concat('data',uniquestring(resourceGroup().id))]"
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "D1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "http20State": {
+      "type": "bool",
+      "metadata": {
+        "description": "Defines, if http/2 enabled for this web app"
+      },
+      "defaultValue": true
+    },
+    "minimalTlsVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "Defines minimal TLS version to be used"
+      },
+      "allowedValues": [
+        "1.0",
+        "1.1",
+        "1.2"
+      ],
+      "defaultValue": "1.2"
+    },
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "[concat('webApp',uniquestring(resourceGroup().id))]"
+    },
+    "webAppServicePlanName": {
+      "type": "string",
+      "defaultValue": "[concat('webAppService',uniquestring(resourceGroup().id))]"
+    },
+    "webAppTimeZone": {
+        "type": "string",
+        "defaultValue": "W. Europe Standard Time",
+        "metadata": {
+            "description": "Defines web application time zone"
+        }
+    },
+    "appInsightsInstrumentationKey": {
+        "type": "string",
+        "metadata": {
+            "description": "Application Insights Instrumentation key"
+        }
+    },
+    "webJobsIdleTimeOut": {
+        "type": "string",
+        "defaultValue": "3600",
+        "metadata": {
+            "description": "Defines web job idle timeout"
+        }
+    },
+    "nodeDefaultVersion": {
+        "type": "string",
+        "defaultValue": "4.4.7",
+        "metadata": {
+            "description": "Defines Node.js default version for web app"
+        }
+    },
+    "AzureDevOpsPoolName": {
+        "type": "string",
+        "metadata": {
+            "description": "Azure DevOps pool name to monitor (could be any string, if you define following pool id)"
+        }
+    },
+    "AzureDevOpsPoolId": {
+        "type": "int"
+    },
+    "AzureDevOpsInstanceName": {
+        "type": "string",
+        "metadata": {
+            "description": "Azure DevOps instance name to be used"
+        }
+    },
+    "AzureDevOpsPAT": {
+        "type": "securestring",
+        "metadata": {
+            "description": "Azure DevOps Personal Access Token"
+        }
+    },
+    "AzureServicePrincipleId": {
+        "type": "string",
+        "metadata": {
+            "description": "Azure Service Principle Client ID to get VMSS data"
+        }
+    },
+    "AzureServicePrincipleSecret": {
+        "type": "securestring",
+        "metadata": {
+            "description": "Azure Service Principle Secret"
+        }
+    },
+    "AzureServicePrincipleTenant": {
+        "type": "string",
+        "metadata": {
+            "description": "Azure Service Principle Tenant ID to get VMSS data"
+        }
+    },
+    "AzureSubscriptionId": {
+        "type": "securestring",
+        "metadata": {
+            "description": "Azure Subscription ID, where VMSS is hosted"
+        }
+    },
+    "AzureVMSSResourceGroup": {
+        "type": "string",
+        "metadata": {
+            "description": "Azure Resource Group Name, where DevOps agents VMSS are hosted"
+        }
+    },
+    "AzureVMSSName": {
+        "type": "string",
+        "metadata": {
+            "description": "VMSS Name with agents"
+        }
+    },
+    "IsDryRun": {
+        "type": "bool",
+        "defaultValue": true,
+        "metadata": {
+            "description": "Dry Run allows to check, if execution goes correctly"
+        }
+    },
+    "defaultTrackingTableName": {
+        "type": "string",
+        "defaultValue": "[concat(parameters('AzureVMSSResourceGroup'),'-',parameters('AzureVMSSName'))]",
+        "metadata": {
+            "description": "Table to create (de)provisining records"
+        }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "storageAccountApiVersion": "2015-06-15",
+    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+    "storageConnectionStringPrefix": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccountName')]",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "Storage"
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[parameters('webAppServicePlanName')]",
+      "type": "Microsoft.Web/serverFarms",
+      "location": "[variables('location')]",
+      "tags": {
+        "env": "[parameters('environmentTag')]",
+        "platform": "[parameters('platformTag')]",
+        "app": "[parameters('appTag')]"
+      },
+      "properties": {
+        "name": "[parameters('webAppServicePlanName')]"
+      },
+      "sku": {
+        "name": "[parameters('skuName')]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[parameters('webAppName')]",
+      "type": "Microsoft.Web/Sites",
+      "location": "[variables('location')]",
+      "tags": {
+        "env": "[parameters('environmentTag')]",
+        "platform": "[parameters('platformTag')]",
+        "app": "[parameters('appTag')]",
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('webAppServicePlanName'))]": "empty"
+      },
+      "dependsOn": [ "[concat('Microsoft.Web/serverFarms/', parameters('webAppServicePlanName'))]" ],
+      "properties": {
+        "name": "[parameters('webAppName')]",
+        "serverFarmId": "[parameters('webAppServicePlanName')]",
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "appSettings": [],
+          "use32BitWorkerProcess": "[parameters('use32bitWorkerProcess')]",
+          "phpVersion": "",
+          "defaultDocuments": [
+            "index.html"
+          ],
+          "webSocketsEnabled": false,
+          "alwaysOn": "[parameters('enableAlwaysOn')]",
+          "httpLoggingEnabled": true,
+          "logsDirectorySizeLimit": 10,
+          "http20Enabled": "[parameters('http20State')]",
+          "minTlsVersion": "[parameters('minimalTlsVersion')]"
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-03-01",
+          "type": "config",
+          "name": "connectionstrings",
+          "dependsOn": [ "[concat('Microsoft.Web/Sites/', parameters('webAppName'))]" ],
+          "properties": {
+            "AzureWebJobsDashboard": {
+                "value": "[concat(variables('storageConnectionStringPrefix'), listkeys(variables('storageId'), variables('storageAccountApiVersion')).key1)]",
+                "type": "Custom"
+              },
+              "AzureWebJobsStorage": {
+                "value": "[concat(variables('storageConnectionStringPrefix'), listkeys(variables('storageId'), variables('storageAccountApiVersion')).key1)]",
+                "type": "Custom"
+              }              
+          }
+        },
+        {
+            "apiVersion": "2016-03-01",
+            "name": "slotconfignames",
+            "type": "config",
+            "dependsOn": [ "[concat('Microsoft.Web/Sites/', parameters('webAppName'))]" ],
+            "properties": {
+              "appSettingNames": [
+                "WEBSITE_TIME_ZONE",
+                "APPINSIGHTS_INSTRUMENTATIONKEY",
+                "MobileAppsManagement_EXTENSION_VERSION",
+                "WEBJOBS_IDLE_TIMEOUT",
+                "WEBSITE_NODE_DEFAULT_VERSION",
+                "Agents_PoolName",
+                "Agents_PoolId",
+                "Azure_DevOpsInstance",
+                "Azure_DevOpsPAT",
+                "Azure_ServicePrincipleClientId",
+                "Azure_ServicePrincipleClientSecret",
+                "Azure_ServicePrincipleTenantId",
+                "Azure_SubscriptionId",
+                "Azure_VMSS_resourceGroupName",
+                "Azure_VMSS_Name",
+                "DryRunExecution",
+                "Azure_Storage_ConnectionString",
+                "Azure_Storage_ActionsTracking_TableName"
+              ]
+            }
+          },
+          {
+            "apiVersion": "2016-03-01",
+            "type": "config",
+            "name": "appsettings",
+            "dependsOn": [ "[concat('Microsoft.Web/Sites/', parameters('webAppName'))]" ],
+            "properties": {
+              "WEBSITE_TIME_ZONE": "[parameters('webAppTimeZone')]",
+              "APPINSIGHTS_INSTRUMENTATIONKEY": "[parameters('appInsightsInstrumentationKey')]",
+              "MobileAppsManagement_EXTENSION_VERSION": "latest",
+              "WEBJOBS_IDLE_TIMEOUT": "[parameters('webJobsIdleTimeOut')]",
+              "WEBSITE_NODE_DEFAULT_VERSION": "[parameters('nodeDefaultVersion')]",
+              "Agents_PoolName": "[parameters('AzureDevOpsPoolName')]",
+              "Agents_PoolId": "[parameters('AzureDevOpsPoolId')]",
+              "Azure_DevOpsInstance": "[parameters('AzureDevOpsInstanceName')]",
+              "Azure_DevOpsPAT": "[parameters('AzureDevOpsPAT')]",
+              "Azure_ServicePrincipleClientId": "[parameters('AzureServicePrincipleId')]",
+              "Azure_ServicePrincipleClientSecret": "[parameters('AzureServicePrincipleSecret')]",
+              "Azure_ServicePrincipleTenantId": "[parameters('AzureServicePrincipleTenant')]",
+              "Azure_SubscriptionId": "[parameters('AzureSubscriptionId')]",
+              "Azure_VMSS_resourceGroupName": "[parameters('AzureVMSSResourceGroup')]",
+              "Azure_VMSS_Name": "[parameters('AzureVMSSName')]",
+              "DryRunExecution": "[parameters('IsDryRun')]",
+              "Azure_Storage_ConnectionString": "[concat(variables('storageConnectionStringPrefix'), listkeys(variables('storageId'), variables('storageAccountApiVersion')).key1)]",
+              "Azure_Storage_ActionsTracking_TableName": "[parameters('defaultTrackingTableName')]"
+            }
+          }
+      ]
+    }
+  ],
+  "outputs": {
+    "storageAccountName": {
+      "type": "string",
+      "value": "[parameters('storageAccountName')]"
+    },
+    "webAppName": {
+      "type": "string",
+      "value": "[parameters('webAppName')]"
+    }
+  }
+}
