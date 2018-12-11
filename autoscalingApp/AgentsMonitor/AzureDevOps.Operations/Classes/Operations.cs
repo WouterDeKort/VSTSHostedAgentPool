@@ -65,7 +65,7 @@ namespace AzureDevOps.Operations.Classes
 
 #pragma warning disable 4014
             //I wish this record to be processed on it's own; it is just tracking
-            RecordDataInTable(resourceGroupName, vmssName, addMoreAgents);
+            RecordDataInTable(resourceGroupName, vmssName, addMoreAgents, amountOfAgents);
 #pragma warning restore 4014
 
             if (!addMoreAgents)
@@ -115,7 +115,7 @@ namespace AzureDevOps.Operations.Classes
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
-        private static async Task RecordDataInTable(string rgName, string vmScaleSetName, bool isProvisioning)
+        private static async Task RecordDataInTable(string rgName, string vmScaleSetName, bool isProvisioning, int agentsCount)
         {
             var storageConnectionString = ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];
 
@@ -132,7 +132,7 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            var entity = new ScaleEventEntity(rgName, vmScaleSetName) {IsProvisioningEvent = isProvisioning};
+            var entity = new ScaleEventEntity(rgName, vmScaleSetName) {IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount};
 
             await Properties.ActionsTrackingOperations.InsertOrReplaceEntityAsync(entity);
         }

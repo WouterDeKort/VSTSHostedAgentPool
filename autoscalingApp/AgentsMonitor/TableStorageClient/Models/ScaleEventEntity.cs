@@ -22,5 +22,9 @@ namespace TableStorageClient.Models
         /// Records, if we are starting more VMs at VMSS or deprovisining existing
         /// </summary>
         public bool IsProvisioningEvent { get; set; }
+        /// <summary>
+        /// Records how much VMs we are (de)provisioning in given Virtual Machines Scale Set
+        /// </summary>
+        public int AmountOfVms { get; set; }
     }
 }
