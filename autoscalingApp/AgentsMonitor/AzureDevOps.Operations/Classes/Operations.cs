@@ -37,6 +37,11 @@ namespace AzureDevOps.Operations.Classes
             var resourceGroupName = ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
             var vmssName = ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
             var vmss = azure.VirtualMachineScaleSets.GetByResourceGroup(resourceGroupName, vmssName);
+            if (vmss == null)
+            {
+                Console.WriteLine($"Could not retrieve Virtual Machines Scale Set with name {vmssName} in resource group {resourceGroupName}. Exiting...");
+                Environment.Exit(Constants.ErrorExitCode);
+            }
             var virtualMachines = vmss.VirtualMachines.List()
                 .Select(vmssVm => new ScaleSetVirtualMachineStripped
                 {
