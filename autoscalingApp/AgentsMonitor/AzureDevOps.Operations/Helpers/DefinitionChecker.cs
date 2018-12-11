@@ -12,7 +12,7 @@ namespace AzureDevOps.Operations.Helpers
         public static void CheckAllSettings()
         {
             if (string.IsNullOrWhiteSpace(
-                    ConfigurationManager.AppSettings[Constants.AgentsPoolNameSettingName]) ||
+                    ConfigurationManager.AppSettings[Constants.AgentsPoolNameSettingName]) &&
                 string.IsNullOrWhiteSpace(
                     ConfigurationManager.AppSettings[Constants.AgentsPoolIdSettingName]))
             {
