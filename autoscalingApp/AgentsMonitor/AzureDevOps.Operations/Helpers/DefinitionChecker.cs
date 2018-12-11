@@ -1,8 +1,8 @@
-﻿using AzureDevOps.Operations.Classes;
-using System;
+﻿using System;
 using System.Configuration;
+using AzureDevOps.Operations.Classes;
 
-namespace AutoScaler
+namespace AzureDevOps.Operations.Helpers
 {
     public static class DefinitionChecker
     {
