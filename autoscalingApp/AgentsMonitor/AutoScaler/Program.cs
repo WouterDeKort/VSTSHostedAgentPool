@@ -34,7 +34,7 @@ namespace AutoScaler
         }
 
         [Singleton]
-        public static void RemindersFunction([TimerTrigger("0 */5 * * * *")] TimerInfo timerInfo, TextWriter log) 
+        public static void QueueChecker([TimerTrigger("0 */5 * * * *")] TimerInfo timerInfo, TextWriter log) 
         {
             var poolIdSetting = ConfigurationManager.AppSettings[Constants.AgentsPoolIdSettingName];
 
