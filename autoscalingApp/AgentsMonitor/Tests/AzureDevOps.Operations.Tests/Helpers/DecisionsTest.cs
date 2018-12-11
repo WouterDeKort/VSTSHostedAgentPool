@@ -44,13 +44,14 @@ namespace AzureDevOps.Operations.Tests.Helpers
 
             var vmScaleSetData = GetTestData(10, testArray);
             var instanceIds = GetInstanceIds(vmScaleSetData);
-            Assert.IsTrue(instanceIds.Length.Equals(1));
-            Assert.IsTrue(instanceIds[0].Equals(testValid.VmInstanceId));
+            Assert.IsTrue(instanceIds.Length.Equals(10));
+            Assert.IsFalse(instanceIds[0].Equals(testValid.VmInstanceId));
         }
 
         [Test]
         public static void TestInstanceIdRetrieval_agents_is_there()
         {
+            //this test ensures that we would not deallocate VMs, which have running jobs
             var testArray = new ScaleSetVirtualMachineStripped[3];
             var testValid = new ScaleSetVirtualMachineStripped
             {
@@ -76,26 +77,28 @@ namespace AzureDevOps.Operations.Tests.Helpers
 
             var vmScaleSetData = GetTestData(10, testArray);
             var instanceIds = GetInstanceIds(vmScaleSetData, TestsConstants.TestPoolId, TestsConstants.Json3JobIsRunning);
-            Assert.IsTrue(instanceIds.Length.Equals(3));
-            Assert.IsTrue(instanceIds[0].Equals(testArray[0].VmInstanceId));
+            Assert.IsTrue(instanceIds.Length.Equals(10));
+            Assert.IsFalse(instanceIds[0].Equals(testArray[0].VmInstanceId));
         }
 
         [Test]
         public static void TestInstanceIdRetrieval_agent_is_not_there()
         {
+            //this test describes situation, when we have something running in the pool, but not on our agents :); really weird issue
             var vmScaleSetData = GetTestData(10);
 
             var instanceIds = GetInstanceIds(vmScaleSetData);
-            Assert.IsTrue(instanceIds.Length.Equals(0));
+            Assert.IsTrue(instanceIds.Length.Equals(10));
         }
 
         [Test]
         public static void TestInstanceIdRetrieval_no_jobs_retrieved()
         {
+            //this test ensures that when there is no jobs running - we can deallocate all VMs
             var vmScaleSetData = GetTestData(10);
 
             var instanceIds = GetInstanceIds(vmScaleSetData, 1);
-            Assert.IsTrue(instanceIds.Length.Equals(0));
+            Assert.IsTrue(instanceIds.Length.Equals(10));
         }
 
         private static string[] GetInstanceIds(List<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
@@ -105,6 +108,12 @@ namespace AzureDevOps.Operations.Tests.Helpers
                 dataRetriever.GetRuningJobs(poolId));
         }
 
+        /// <summary>
+        /// Generates stripped VMSS list to work with; allows to generate to amount which is needed and add custom data to the collection
+        /// </summary>
+        /// <param name="testListSize"></param>
+        /// <param name="addedData"></param>
+        /// <returns></returns>
         private static List<ScaleSetVirtualMachineStripped> GetTestData(int testListSize, ScaleSetVirtualMachineStripped[] addedData = null)
         {
             var vmScaleSetData = new List<ScaleSetVirtualMachineStripped>();
