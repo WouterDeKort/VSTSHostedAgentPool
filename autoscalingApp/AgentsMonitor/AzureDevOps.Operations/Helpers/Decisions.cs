@@ -31,21 +31,20 @@ namespace AzureDevOps.Operations.Helpers
             return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 
-        public static string[] CollectInstanceIdsToDeallocate(List<ScaleSetVirtualMachineStripped>vmScaleSetStrippedDictionary, JobRequest[] jobRequests)
+        public static string[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)
         {
-            if (!jobRequests.Any())
+            var instanceIdList = new List<string>();
+            var busyAgentsNames = jobRequests.Select(job => job.ReservedAgent.Name).ToArray();
+
+            foreach (var scaleSetVirtualMachineStripped in vmScaleSetStripped)
             {
-                //nothing retrieved from jobs
-                return new[] { string.Empty };
+                if (!busyAgentsNames.Contains(scaleSetVirtualMachineStripped.VmName))
+                {
+                    instanceIdList.Add(scaleSetVirtualMachineStripped.VmInstanceId);
+                }
             }
 
-            var instanceIdCollection = (from vmssVm in vmScaleSetStrippedDictionary 
-                let vmName = vmssVm.VmName 
-                let vmInstanceId = vmssVm.VmInstanceId
-                where jobRequests.Any(job => job.ReservedAgent.Name.Equals(vmName, StringComparison.OrdinalIgnoreCase))
-                select vmInstanceId).ToArray();
-
-            return instanceIdCollection;
+            return instanceIdList.ToArray();
         }
     }
 }

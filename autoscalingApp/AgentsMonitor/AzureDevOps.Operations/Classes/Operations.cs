@@ -71,8 +71,8 @@ namespace AzureDevOps.Operations.Classes
             if (!addMoreAgents)
             {
                 Console.WriteLine("Deallocating VMs");
-                //we need to downscale
-                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines, currentJobs);
+                //we need to downscale, only running VMs shall be selected here
+                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), currentJobs);
 
                 foreach (var instanceId in instanceIdCollection)
                 {

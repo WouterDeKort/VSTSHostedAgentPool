@@ -4,6 +4,8 @@ using AzureDevOps.Operations.Tests.Classes;
 using AzureDevOps.Operations.Tests.Data;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Azure.Management.Compute.Fluent;
 
 namespace AzureDevOps.Operations.Tests.Helpers
 {
@@ -36,7 +38,8 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var testValid = new ScaleSetVirtualMachineStripped
             {
                 VmName = "Agent",
-                VmInstanceId = "205"
+                VmInstanceId = "205",
+                VmInstanceState = PowerState.Running
             };
 
             var testArray = new ScaleSetVirtualMachineStripped[1];
@@ -56,21 +59,24 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var testValid = new ScaleSetVirtualMachineStripped
             {
                 VmName = "Agent",
-                VmInstanceId = "205"
+                VmInstanceId = "205",
+                VmInstanceState = PowerState.Running
             };
 
             testArray[0] = testValid;
             testValid = new ScaleSetVirtualMachineStripped
             {
                 VmName = "Agent1",
-                VmInstanceId = "2052"
+                VmInstanceId = "2052",
+                VmInstanceState = PowerState.Running
             };
 
             testArray[1] = testValid;
             testValid = new ScaleSetVirtualMachineStripped
             {
                 VmName = "Agent2",
-                VmInstanceId = "20522"
+                VmInstanceId = "20522",
+                VmInstanceState = PowerState.Running
             };
 
             testArray[2] = testValid;
@@ -100,11 +106,25 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var instanceIds = GetInstanceIds(vmScaleSetData, 1);
             Assert.IsTrue(instanceIds.Length.Equals(10));
         }
+        /// <summary>
+        /// Where there is no running instances - nothing could be deallocated
+        /// </summary>
+        [Test]
+        public static void TestInstanceIdRetrieval_no_running_vms_there()
+        {
+            var vmScaleSetData = GetTestData(10);
+            foreach (var t in vmScaleSetData)
+            {
+                t.VmInstanceState = PowerState.Deallocated;
+            }
+            var instanceIds = GetInstanceIds(vmScaleSetData, 1);
+            Assert.IsTrue(instanceIds.Length.Equals(0));
+        }
 
-        private static string[] GetInstanceIds(List<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
+        private static string[] GetInstanceIds(IEnumerable<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
         {
             var dataRetriever = RetrieveTests.CreateRetriever(jsonData);
-            return Decisions.CollectInstanceIdsToDeallocate(vmScaleSetData,
+            return Decisions.CollectInstanceIdsToDeallocate(vmScaleSetData.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)),
                 dataRetriever.GetRuningJobs(poolId));
         }
 
@@ -127,7 +147,8 @@ namespace AzureDevOps.Operations.Tests.Helpers
                 vmScaleSetData.Add(new ScaleSetVirtualMachineStripped
                 {
                     VmName = $"vm{counter}",
-                    VmInstanceId = $"{counter}"
+                    VmInstanceId = $"{counter}",
+                    VmInstanceState = PowerState.Running
                 });
             }
 
