@@ -10,6 +10,10 @@
 ## Description
 This template allows you to deploy an app service plan and a basic Windows web app with storage account, required to execute autoscaler app. Deploys to shared web app to minify spending - so, you'll need either to define bigger web app or find a way to ping it once in 5 minutes
 
-## Example configuration for Azure DevOps deployment
+## Example configuration for deployment
 
-TODO
+I did some preparations for publishing via Visual Studio or MsDeploy, but, for my deployments - I'll use just build in Release, which will output all required files to a folder ~\autoscalingApp\WebJob\ - then, I'll use simple MsDeploy command to deliver it on web app: 
+
+```cmd
+"$(msdeploy.Path)" -allowUntrusted="True" -enableRule:DoNotDeleteRule -verb:sync -source:contentPath="~\autoscalingApp\WebJob\" -dest:contentPath="$(deploy.iisSiteName)/App_Data/jobs/continuous/",computerName="https://$(deploy.iisSiteName).scm.azurewebsites.net:443/msdeploy.axd?site=$(deploy.iisSiteName)",username="$(user)",password="%userPwd%",authType="Basic"
+```

@@ -40,7 +40,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\WebJob\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -133,25 +133,31 @@
     <Message Text="*************************************************" Importance="high" />
     <ItemGroup>
       <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
-        <SkipAction></SkipAction>
+        <SkipAction>
+        </SkipAction>
         <ObjectName>dirPath</ObjectName>
         <AbsolutePath>$(_Escaped_WPPAllFilesInSingleFolder)\\bin$</AbsolutePath>
         <Apply>Source</Apply>
-        <XPath></XPath>
+        <XPath>
+        </XPath>
       </MsDeploySkipRules>
       <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
-        <SkipAction></SkipAction>
+        <SkipAction>
+        </SkipAction>
         <ObjectName>dirPath</ObjectName>
         <AbsolutePath>$(_Escaped_DestinationContentPath)\\bin$</AbsolutePath>
         <Apply>Destination</Apply>
-        <XPath></XPath>
+        <XPath>
+        </XPath>
       </MsDeploySkipRules>
       <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
-        <SkipAction></SkipAction>
+        <SkipAction>
+        </SkipAction>
         <ObjectName>dirPath</ObjectName>
         <AbsolutePath>^bin$</AbsolutePath>
         <Apply>Source</Apply>
-        <XPath></XPath>
+        <XPath>
+        </XPath>
       </MsDeploySkipRules>
     </ItemGroup>
   </Target>
