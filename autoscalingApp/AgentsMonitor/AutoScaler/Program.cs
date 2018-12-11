@@ -20,7 +20,7 @@ namespace AutoScaler
             ServicePointManager.SecurityProtocol &= ~SecurityProtocolType.Ssl3;
 
             //check all required settings
-            DefinitionChecker.CheckAllSettings();
+            SettingsChecker.CheckAllSettings();
 
             var config = new JobHostConfiguration();
             config.UseTimers();

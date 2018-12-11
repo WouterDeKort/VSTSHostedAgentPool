@@ -4,7 +4,7 @@ using AzureDevOps.Operations.Classes;
 
 namespace AzureDevOps.Operations.Helpers
 {
-    public static class DefinitionChecker
+    public static class SettingsChecker
     {
         /// <summary>
         /// Checks that all required settings are defined; if check fails - job will exit
