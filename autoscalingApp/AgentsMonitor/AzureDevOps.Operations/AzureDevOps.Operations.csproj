@@ -164,6 +164,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Checker.cs" />
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\Operations.cs" />
     <Compile Include="Classes\Retrieve.cs" />
