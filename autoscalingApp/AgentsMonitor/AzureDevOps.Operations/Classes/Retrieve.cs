@@ -6,7 +6,7 @@ using System.Net.Http;
 
 namespace AzureDevOps.Operations.Classes
 {
-    public class Retrieve
+    public class Retrieve : IDisposable
     {
         /// <summary>
         /// Organization agentsPoolName in Azure DevOps
@@ -129,6 +129,11 @@ namespace AzureDevOps.Operations.Classes
         {
             var url = $"{AzureDevOpsUrl}/{AzureDevOpsOrganizationName}/{TasksBaseUrl}/{agentsPoolId}/jobrequests";
             return GetData.DownloadSerializedJsonData<JobRequests>(url, AzureDevOpsPersonalAccessToken, _localHttpClient)?.AllJobRequests?.Where(x => x.Result == null).ToArray();
+        }
+
+        public void Dispose()
+        {
+            _localHttpClient?.Dispose();
         }
     }
 }
