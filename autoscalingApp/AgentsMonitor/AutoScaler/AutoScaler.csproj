@@ -14,6 +14,16 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <OnBeforePackageUsingManifest>
+      $(OnBeforePackageUsingManifest);
+      AddSkipBinRule;
+    </OnBeforePackageUsingManifest>
+    <AfterAddIisSettingAndFileContentsToSourceManifest>
+      $(AfterAddIisSettingAndFileContentsToSourceManifest);
+      AddSkipBinRule;
+    </AfterAddIisSettingAndFileContentsToSourceManifest>
+    <UseMsDeployExe>True</UseMsDeployExe>
+    <SkipExtraFilesOnServer Condition=" '$(SkipExtraFilesOnServer)' == '' ">true</SkipExtraFilesOnServer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -116,4 +126,33 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AddSkipBinRule">
+    <!-- This target defines which files and folders shall not be deleted by publish process for all webapplications -->
+    <Message Text="*************************************************" Importance="high" />
+    <Message Text="Calling AddDefaultSkipRule" Importance="high" />
+    <Message Text="*************************************************" Importance="high" />
+    <ItemGroup>
+      <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
+        <SkipAction></SkipAction>
+        <ObjectName>dirPath</ObjectName>
+        <AbsolutePath>$(_Escaped_WPPAllFilesInSingleFolder)\\bin$</AbsolutePath>
+        <Apply>Source</Apply>
+        <XPath></XPath>
+      </MsDeploySkipRules>
+      <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
+        <SkipAction></SkipAction>
+        <ObjectName>dirPath</ObjectName>
+        <AbsolutePath>$(_Escaped_DestinationContentPath)\\bin$</AbsolutePath>
+        <Apply>Destination</Apply>
+        <XPath></XPath>
+      </MsDeploySkipRules>
+      <MsDeploySkipRules Include="SkipBinFolderOnDeploy">
+        <SkipAction></SkipAction>
+        <ObjectName>dirPath</ObjectName>
+        <AbsolutePath>^bin$</AbsolutePath>
+        <Apply>Source</Apply>
+        <XPath></XPath>
+      </MsDeploySkipRules>
+    </ItemGroup>
+  </Target>
 </Project>
