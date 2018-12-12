@@ -12,10 +12,11 @@ namespace TableStorageClient.Models
         {
         }
 
-        public ScaleEventEntity(string virtualMachinesScaleSetResourceGroupName, string virtualMachinesScaleSetName)
+        public ScaleEventEntity(string virtualMachinesScaleSetName)
         {
-            PartitionKey = virtualMachinesScaleSetResourceGroupName;
-            RowKey = virtualMachinesScaleSetName;
+            PartitionKey = virtualMachinesScaleSetName;
+            //for now will set row key to emptry string
+            RowKey = string.Empty;
         }
 
         /// <summary>

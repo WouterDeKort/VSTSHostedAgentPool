@@ -132,7 +132,7 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            var entity = new ScaleEventEntity(rgName, vmScaleSetName) {IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount};
+            var entity = new ScaleEventEntity(vmScaleSetName) {IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount};
 
             await Properties.ActionsTrackingOperations.InsertOrReplaceEntityAsync(entity);
         }
