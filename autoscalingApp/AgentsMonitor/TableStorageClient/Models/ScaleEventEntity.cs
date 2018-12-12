@@ -16,7 +16,7 @@ namespace TableStorageClient.Models
         {
             PartitionKey = virtualMachinesScaleSetName;
             //for now will set row key to emptry string
-            RowKey = DateTime.UtcNow.ToString("dd-MM-yyyy|HH:mm:ss");
+            RowKey = DateTime.UtcNow.ToString("dd-MM-yyyyTHH:mm:ss");
         }
 
         /// <summary>
