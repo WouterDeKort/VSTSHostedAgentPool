@@ -20,7 +20,13 @@ Param(
     [string]$vmssDiskStorageAccount = "Premium_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
-    [switch]$attachDataDisk = $true
+    [switch]$attachDataDisk = $true,
+    #we want to be as secured as possible
+    [bool]$attachNsg = $true,
+    #Provide an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0); or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24).
+    [string]$allowedIps,
+    #Provide a single port, such as 80; a port range, such as 1024-65535; or a comma-separated list of single ports and/or port ranges, such as 80,1024-65535. This specifies on which ports traffic will be allowed or denied by this rule. Provide an asterisk (*) to allow traffic on any port.
+    [string]$allowedPorts = "3389"
 )
 
 #Construct resources names
@@ -35,6 +41,10 @@ if ([string]::IsNullOrWhiteSpace($pipRg)) {
 $lbName = $resourcesBaseName + "-lb";
 $vmssScaleSetName = $resourcesBaseName + "-vmss";
 
+if ([string]::IsNullOrWhiteSpace($allowedIps)) {
+    #allowed IPs is not defined - so, we could not deploy an NSG
+    $attachNsg = $false;
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -62,7 +72,6 @@ $vnet = New-AzureRmVirtualNetwork `
     -AddressPrefix 10.0.0.0/16 `
     -Subnet $subnet `
     -Force
-
 
 Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName -$pipRg -ev pipNotPresent -ea 0
 if ($pipNotPresent){
@@ -152,11 +161,30 @@ Set-AzureRmVmssOsProfile $vmssConfig `
     -ComputerNamePrefix $VMName
 
 Write-Host "Attach the virtual network to the config object"
-Add-AzureRmVmssNetworkInterfaceConfiguration `
+
+if ($attachNsg) {
+    #we want to attach NSG to NIC
+    #define a name for it first
+    $nsgName = $resourcesBaseName + "-nsg";
+    #create NSG
+    $nsg = New-AzureRmNetworkSecurityGroup -Name $nsgName -ResourceGroupName $AgentPoolResourceGroup -Location $Location;
+    #add rule to allow ports
+    $nsg | Add-AzureRmNetworkSecurityRuleConfig -Name Allow_Ports -Access Allow -Protocol Tcp -Direction Inbound ‑Priority 110 -SourceAddressPrefix $allowedIps -SourcePortRange * ‑DestinationAddressPrefix * -DestinationPortRange $allowedPorts | Set-AzureRmNetworkSecurityGroup
+
+    #add NIC to VMSS
+    Add-AzureRmVmssNetworkInterfaceConfiguration `
+    -VirtualMachineScaleSet $vmssConfig `
+    -Name "network-config" `
+    -Primary $true `
+    -IPConfiguration $ipConfig `
+    -NetworkSecurityGroupId $nsg.Id
+} else {
+    Add-AzureRmVmssNetworkInterfaceConfiguration `
     -VirtualMachineScaleSet $vmssConfig `
     -Name "network-config" `
     -Primary $true `
     -IPConfiguration $ipConfig
+}
 
 Write-Host "Create the scale set with the config object (this step might take a few minutes)"
 New-AzureRmVmss `
