@@ -1,0 +1,20 @@
+{
+    "environmentTag": { "value": "production"},
+    "platformTag": { "value": "devops-automation"},
+    "appTag": { "value": "azure-devops"},
+    "storageAccountName": { "value": "genuniquestor"},
+    "webAppName": { "value": "GEN-UNIQUE"},
+    "webAppServicePlanName": { "value": "GEN-UNIQUE"},
+    "appInsightsInstrumentationKey": { "value": "GRAB-YOUR-OWN"},
+    "AzureDevOpsPoolName": { "value": "GRAB-YOUR-OWN-OR-DEFINE-POOL-ID"},
+    "AzureDevOpsPoolId": {"value": 0},
+    "AzureDevOpsInstanceName": {"value": "SET-YOURS-HERE"},
+    "AzureDevOpsPAT": {"value": "SET-YOURS-HERE"},
+    "AzureServicePrincipleId": {"value": "SET-YOURS-HERE"},
+    "AzureServicePrincipleSecret": {"value": "SET-YOURS-HERE"},
+    "AzureServicePrincipleTenant": {"value": "SET-YOURS-HERE"},
+    "AzureSubscriptionId": {"value": "SET-YOURS-HERE"},
+    "AzureVMSSResourceGroup": {"value": "SET-YOURS-HERE"},
+    "AzureVMSSName": {"value": "SET-YOURS-HERE"},
+    "IsDryRun": {"value": true}
+}
