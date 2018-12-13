@@ -9,7 +9,8 @@ Param(
     $ObjectId = $env:ObjectId,
     $ManagedImageResourceGroupName = $env:ManagedImageResourceGroupName,
     $ManagedImageName = $env:ManagedImageName,
-    [switch]$InstallPrerequisites
+    [switch]$InstallPrerequisites,
+    [switch]$EnforceAzureRm
 )
 
 Set-StrictMode -Version Latest
@@ -24,7 +25,9 @@ if ($InstallPrerequisites) {
     choco install packer --version 1.3.2 -y --ignore-checksums --force
     "Install Git"
     choco install git -y
+}
 
+if ($EnforceAzureRm) {
     "Install AzureRM PowerShell commands"
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Install-Module AzureRM -AllowClobber -Force

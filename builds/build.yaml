@@ -8,5 +8,5 @@ steps:
     azureConnectionType: 'ConnectedServiceNameARM'
     azureSubscription: '$(AzureConnectionName)'
     ScriptPath: 'Build.ps1'
-    ScriptArguments: '-Location "$(Location)" -PackerFile "$(PackerFile)" -ClientId "$(ClientId)" -ClientSecret "$(ClientSecret)" -TenantId "$(TenantId)" -SubscriptionId "$(SubscriptionId)" -ObjectId "$(ObjectId)" -ManagedImageResourceGroupName "$(ManagedImageResourceGroupName)" -ManagedImageName "$(ManagedImageName)-$(Build.BuildNumber)" -InstallPrerequisites:$(InstallPrerequisites)'
+    ScriptArguments: '-Location "$(Location)" -PackerFile "$(PackerFile)" -ClientId "$(ClientId)" -ClientSecret "$(ClientSecret)" -TenantId "$(TenantId)" -SubscriptionId "$(SubscriptionId)" -ObjectId "$(ObjectId)" -ManagedImageResourceGroupName "$(ManagedImageResourceGroupName)" -ManagedImageName "$(ManagedImageName)-$(Build.BuildNumber)" -InstallPrerequisites:$(InstallPrerequisites) -EnforceAzureRm:$(EnforceAzureRm)'
     azurePowerShellVersion: 'LatestVersion'
