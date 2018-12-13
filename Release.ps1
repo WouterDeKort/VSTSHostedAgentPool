@@ -169,7 +169,7 @@ if ($attachNsg) {
     #create NSG
     $nsg = New-AzureRmNetworkSecurityGroup -Name $nsgName -ResourceGroupName $AgentPoolResourceGroup -Location $Location;
     #add rule to allow ports
-    $nsg | Add-AzureRmNetworkSecurityRuleConfig -Name Allow_Ports -Access Allow -Protocol Tcp -Direction Inbound ‑Priority 110 -SourceAddressPrefix $allowedIps -SourcePortRange * ‑DestinationAddressPrefix * -DestinationPortRange $allowedPorts | Set-AzureRmNetworkSecurityGroup
+    $nsg | Add-AzureRmNetworkSecurityRuleConfig -Name Allow_Ports -Access Allow -Protocol Tcp -Direction Inbound -Priority 110 -SourceAddressPrefix $allowedIps.Split(',') -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange $allowedPorts.Split(',') | Set-AzureRmNetworkSecurityGroup
 
     #add NIC to VMSS
     Add-AzureRmVmssNetworkInterfaceConfiguration `
