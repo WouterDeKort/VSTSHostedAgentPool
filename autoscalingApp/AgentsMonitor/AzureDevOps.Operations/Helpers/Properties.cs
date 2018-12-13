@@ -8,9 +8,26 @@ namespace AzureDevOps.Operations.Helpers
 {
     public static class Properties
     {
-        internal static string StorageTableName => string.IsNullOrWhiteSpace(
-            ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName]) ? Constants.AzureStorageDefaultTrackingTableName : ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName];
+        internal static string StorageTableName
+        {
+            get
+            {
+                var tableName = string.IsNullOrWhiteSpace(
+                    ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName]) 
+                    ? Constants.AzureStorageDefaultTrackingTableName 
+                    : ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName];
 
+                if (IsDryRun)
+                {
+                    //appending DryRun to table name, as dry run data could not be used to train any ML models
+                    tableName = string.Concat(tableName, "DryRun");
+                }
+
+                return tableName;
+            }
+        }
+
+        internal static bool IsDryRun => GetTypedSetting.GetSetting<bool>(Constants.DryRunSettingName);
 
         private static string StorageConnectionString =>
             ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];

@@ -61,11 +61,9 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            var isDryRun = GetTypedSetting.GetSetting<bool>(Constants.DryRunSettingName);
-
 #pragma warning disable 4014
             //I wish this record to be processed on it's own; it is just tracking
-            RecordDataInTable(resourceGroupName, vmssName, addMoreAgents, amountOfAgents);
+            RecordDataInTable(vmssName, addMoreAgents, amountOfAgents);
 #pragma warning restore 4014
 
             if (!addMoreAgents)
@@ -77,7 +75,7 @@ namespace AzureDevOps.Operations.Classes
                 foreach (var instanceId in instanceIdCollection)
                 {
                     Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
-                    if (!isDryRun)
+                    if (!Properties.IsDryRun)
                     {
                         vmss.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(resourceGroupName, vmssName,
                             instanceId);
@@ -95,7 +93,7 @@ namespace AzureDevOps.Operations.Classes
                         break;
                     }
                     Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
-                    if (!isDryRun)
+                    if (!Properties.IsDryRun)
                     {
                         vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
                             scaleSetVirtualMachineStripped.VmInstanceId);
@@ -115,7 +113,7 @@ namespace AzureDevOps.Operations.Classes
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
-        private static async Task RecordDataInTable(string rgName, string vmScaleSetName, bool isProvisioning, int agentsCount)
+        private static async Task RecordDataInTable(string vmScaleSetName, bool isProvisioning, int agentsCount)
         {
             var storageConnectionString = ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];
 
