@@ -22,6 +22,8 @@ namespace AzureDevOps.Operations.Helpers
                     //appending DryRun to table name, as dry run data could not be used to train any ML models
                     tableName = string.Concat(tableName, "DryRun");
                 }
+                //removing dashes (if user set them for table name)
+                tableName = tableName.Replace("-", string.Empty);
 
                 return tableName;
             }
