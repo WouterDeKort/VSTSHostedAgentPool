@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param(
     [string]$VMUser = $env:VMUser,
-    [string]$VMUserPassword = $env:VMUserPassword,
+    [SecureString]$VMUserPassword = $env:VMUserPassword,
     #could not be longer than 9 symbols
     [string]$VMName = $env:VMName,
     [string]$ManagedImageResourceGroupName = $env:ManagedImageResourceGroupName,
