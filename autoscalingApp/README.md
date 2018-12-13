@@ -12,3 +12,38 @@ Job shall check maximum amount of possible private agents in account and ensure 
 Job shall log start/stop attempts in external storage for future ML model training. 
 
 Job is written on C#, as it is easier than Powershell for me :)
+
+## Settings 
+
+Currently, settings are set in App.config (or one can use ARM template in arm-template folder and deploy them as appsettings in Azure Web app).
+
+```Agents_PoolName``` - specify pool name to monitor here (or set ```Agents_PoolId```)
+
+```Agents_PoolId``` - if ```Agents_PoolName``` is not specified, set ID here
+
+```Azure_DevOpsInstance``` - specify you Azure Devops instance name (first segment after hostname https://dev.azure.com/). Example: ```https://dev.azure.com/testusername/``` - here your instance name is ```testusername```
+
+```Azure_DevOpsPAT``` - personal access token for Azure DevOps. See https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=vsts 
+
+```Azure_ServicePrincipleClientId``` - Azure Service Principle ID (must have at least Contribute on VMSS which hosts agents)
+
+```Azure_ServicePrincipleClientSecret``` - Azure Service Principle Client Secret
+
+```Azure_ServicePrincipleTenantId``` - Azure Service Principle Tenant ID
+
+```Azure_SubscriptionId``` - Azure Subscription, where VMSS with agents is hosted
+
+```Azure_VMSS_resourceGroupName``` - resource group name, which hosts VMSS
+
+```Azure_VMSS_Name``` - Azure VMSS name
+
+```DryRunExecution``` - if set to true, then now actual (de)provision actions will be taken against VMSS; ```Azure_Storage_ActionsTracking_TableName``` will be appended with ```DryRun``` to not mangle with actual run data
+
+```Azure_Storage_ConnectionString``` - Azure Storage connection string to store runtime data for monitoring and possible ML usage (who knows). If empty - data will not be stored
+
+```Azure_Storage_ActionsTracking_TableName``` - table name to store runtime data in. If empty and connection string ```Azure_Storage_ConnectionString``` specified - then it will default to ```DefaultTrackingTable```.
+
+As will all Web Jobs - you need to specify connection strings to Azure Storage (they are used behind the scenes for logging and time tracking).
+
+They must be specified in following connection strings: ```AzureWebJobsDashboard``` and ```AzureWebJobsStorage```.
+
