@@ -163,6 +163,7 @@ Set-AzureRmVmssOsProfile $vmssConfig `
 Write-Host "Attach the virtual network to the config object"
 
 if ($attachNsg) {
+    Write-Host "Attaching Network Security group to VMSS";
     #we want to attach NSG to NIC
     #define a name for it first
     $nsgName = $resourcesBaseName + "-nsg";
