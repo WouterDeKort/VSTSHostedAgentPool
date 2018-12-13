@@ -29,6 +29,8 @@ Param(
     [string]$allowedPorts = "3389"
 )
 
+
+Import-Module $PSScriptRoot\functions\helpers.psm1
 #Construct resources names
 $AgentPoolResourceGroup = $resourcesBaseName + "-rg";
 $subnetName = $resourcesBaseName + "-subnet";
@@ -280,7 +282,7 @@ Update-AzureRmVmss `
     -VirtualMachineScaleSet $vmss
 
 Write-Host "Assigning tags to resource"
-$azureResourceInfo = Find-AzureRmResource -ResourceNameEquals $AgentPoolResourceGroup -ResourceNameEquals $vmssScaleSetName;
+$azureResourceInfo = Get-AzureRmResource -ResourceId $vmss.Id;
 Set-AzureRmResource -Tag @{ billingCategory="DevProductivity"; environment="Dev"; resourceType="AzureDevOps" } -ResourceName $vmssScaleSetName -ResourceType $azureResourceInfo.resourceType -ResourceGroupName $AgentPoolResourceGroup -Force;
 
 Write-Host "Finished creating VM Scale Set and installing Agent"
