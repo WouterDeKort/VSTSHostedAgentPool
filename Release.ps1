@@ -20,7 +20,7 @@ Param(
     [string]$vmssDiskStorageAccount = "Premium_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
-    [switch]$attachDataDisk = $true,
+    [bool]$attachDataDisk = $true,
     #we want to be as secured as possible
     [bool]$attachNsg = $true,
     #Provide an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0); or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24).
