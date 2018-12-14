@@ -84,6 +84,8 @@ namespace AzureDevOps.Operations.Helpers
                     //something went wrong 
                     Console.WriteLine($"Could not retrieve pool id for {agentsPoolName}, have to exit");
                     LeaveTheBuilding.Exit(Checker.DataRetriever);
+                    //does not makes a sense here, as we are exiting - but it makes compiler happy :)
+                    return 0;
                 }
                 _agentsPoolId = poolIdNullable.Value;
 

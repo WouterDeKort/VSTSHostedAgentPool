@@ -6,6 +6,7 @@ using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,8 +40,12 @@ namespace AzureDevOps.Operations.Classes
             {
                 Console.WriteLine($"Could not retrieve Virtual Machines Scale Set with name {vmssName} in resource group {resourceGroupName}. Exiting...");
                 LeaveTheBuilding.Exit(Checker.DataRetriever);
+                //return statement does not have any sense here, but it save
+                return;
             }
             var virtualMachines = vmss.VirtualMachines.List()
+                //there could be failed VMs during provisioning
+                .Where(vm => !vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase))
                 .Select(vmssVm => new ScaleSetVirtualMachineStripped
                 {
                     VmInstanceId = vmssVm.InstanceId,
@@ -88,6 +93,22 @@ namespace AzureDevOps.Operations.Classes
                             instanceId);
                     }
                 }
+                //if we are deprovisioning - it is some time to do some housekeeping as well
+                if (!Properties.IsDryRun)
+                {
+                    var failedVms = vmss.VirtualMachines.List().Where(vm =>
+                        vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                    if (failedVms.Any())
+                    {
+                        Console.WriteLine("We have some failed VMs and will try to reimage them async");
+#pragma warning disable 4014
+                        ReimageFailedVm(failedVms);
+#pragma warning restore 4014
+                    }
+                }
+                
+
             }
             else
             {
@@ -140,6 +161,19 @@ namespace AzureDevOps.Operations.Classes
             var entity = new ScaleEventEntity(vmScaleSetName) { IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount };
 
             await Properties.ActionsTrackingOperations.InsertOrReplaceEntityAsync(entity);
+        }
+
+        /// <summary>
+        /// If there is a failed VM in VMSS - we can reimage them
+        /// </summary>
+        /// <param name="failedVirtualMachines"></param>
+        /// <returns></returns>
+        private static async Task ReimageFailedVm(IEnumerable<IVirtualMachineScaleSetVM> failedVirtualMachines)
+        {
+            foreach (var virtualMachineScaleSetVm in failedVirtualMachines)
+            {
+                await virtualMachineScaleSetVm.ReimageAsync();
+            }
         }
     }
 }
