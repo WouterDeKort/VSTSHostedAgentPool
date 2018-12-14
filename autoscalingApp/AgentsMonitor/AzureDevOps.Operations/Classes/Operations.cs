@@ -20,22 +20,9 @@ namespace AzureDevOps.Operations.Classes
         /// </summary>
         /// <param name="onlineAgents"></param>
         /// <param name="maxAgentsInPool"></param>
-        /// <param name="dataRetriever">Used to get data from Azure DevOps</param>
-        /// <param name="agentsPoolId"></param>
-        public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool)
+        /// <param name="areWeCheckingToStartVmInVmss">Describes, which functions calls out - provisioning or deprovisioning</param>
+        public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool, bool areWeCheckingToStartVmInVmss)
         {
-            //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
-            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
-            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
-            var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
-
-            if (amountOfAgents == 0)
-            {
-                //nevertheless - should we (de)provision agents: we are at boundaries
-                Console.WriteLine("Could not add/remove more agents, exiting...");
-                return;
-            }
-
             var credentials = AzureCreds();
 
             var azure = Azure
@@ -60,6 +47,26 @@ namespace AzureDevOps.Operations.Classes
                     VmName = vmssVm.ComputerName,
                     VmInstanceState = vmssVm.PowerState
                 }).ToList();
+
+            //get jobs again to check, if we could deallocate a VM in VMSS
+            //(if it is running a job - it is not wise to deallocate it;
+            //since getting VMMS is potentially lengthy operation - we could need this)
+            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
+            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
+            var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
+
+            if (amountOfAgents == 0)
+            {
+                //nevertheless - should we (de)provision agents: we are at boundaries
+                Console.WriteLine("Could not add/remove more agents, exiting...");
+                return;
+            }
+
+            if (addMoreAgents != areWeCheckingToStartVmInVmss)
+            {
+                //target event is not the same as source one
+                return;
+            }
 
 #pragma warning disable 4014
             //I wish this record to be processed on it's own; it is just tracking

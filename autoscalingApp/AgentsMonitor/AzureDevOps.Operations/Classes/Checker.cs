@@ -28,8 +28,11 @@ namespace AzureDevOps.Operations.Classes
                 return _dataRetrieveCache;
             }
         }
-
-        public static void AgentsQueue()
+        /// <summary>
+        /// Checks agent queue and decides, if we need to provision or not
+        /// </summary>
+        /// <param name="areWeCheckingToStartVm">describes function which called us</param>
+        public static void AgentsQueue(bool areWeCheckingToStartVm)
         {
             var maxAgentsCount = DataRetriever.GetAllAccessibleAgents(Properties.AgentsPoolId);
 
@@ -60,7 +63,7 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount);
+            Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount, areWeCheckingToStartVm);
         }
     }
 }
