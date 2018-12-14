@@ -23,7 +23,7 @@ namespace AzureDevOps.Operations.Classes
         /// <param name="maxAgentsInPool"></param>
         /// <param name="dataRetriever">Used to get data from Azure DevOps</param>
         /// <param name="agentsPoolId"></param>
-        public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool, int agentsPoolId)
+        public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool)
         {
             var credentials = AzureCreds();
 
@@ -50,7 +50,7 @@ namespace AzureDevOps.Operations.Classes
                     VmInstanceState = vmssVm.PowerState
                 }).ToList();
             //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
-            var currentJobs = Checker.DataRetriever.GetRuningJobs(agentsPoolId);
+            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
             var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
             var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
 

@@ -31,42 +31,16 @@ namespace AzureDevOps.Operations.Classes
 
         public static void AgentsQueue()
         {
-            var poolIdSetting = ConfigurationManager.AppSettings[Constants.AgentsPoolIdSettingName];
-
-            int poolId;
-            //if poolId is not defined in settings - we need to retrieve it
-            if (string.IsNullOrWhiteSpace(poolIdSetting))
-            {
-                var agentsPoolName = ConfigurationManager.AppSettings[Constants.AgentsPoolNameSettingName];
-                var poolIdNullable = DataRetriever.GetPoolId(agentsPoolName);
-                if (poolIdNullable == null)
-                {
-                    //something went wrong 
-                    Console.WriteLine($"Could not retrieve pool id for {agentsPoolName}, have to exit");
-                    LeaveTheBuilding.Exit(DataRetriever);
-                }
-                poolId = poolIdNullable.Value;
-            }
-            else
-            {
-                //poolId is defined in settings, we need to parse it now
-                if (!int.TryParse(poolIdSetting, out poolId))
-                {
-                    Console.WriteLine($"Could not parse pool id from appSetting {Constants.AgentsPoolIdSettingName}. Exiting...");
-                    LeaveTheBuilding.Exit(DataRetriever);
-                }
-            }
-
-            var maxAgentsCount = DataRetriever.GetAllAccessibleAgents(poolId);
+            var maxAgentsCount = DataRetriever.GetAllAccessibleAgents(Properties.AgentsPoolId);
 
             if (maxAgentsCount == 0)
             {
-                Console.WriteLine($"There is 0 agents assigned to pool with id {poolId}. Could not proceed, exiting...");
+                Console.WriteLine($"There is 0 agents assigned to pool with id {Properties.AgentsPoolId}. Could not proceed, exiting...");
                 LeaveTheBuilding.Exit(DataRetriever);
             }
 
             var onlineAgentsCount = 0;
-            var countNullable = DataRetriever.GetOnlineAgentsCount(poolId);
+            var countNullable = DataRetriever.GetOnlineAgentsCount(Properties.AgentsPoolId);
             if (countNullable == null)
             {
                 //something went wrong
@@ -78,7 +52,7 @@ namespace AzureDevOps.Operations.Classes
                 onlineAgentsCount = countNullable.Value;
             }
 
-            var waitingJobsCount = DataRetriever.GetCurrentJobsRunningCount(poolId);
+            var waitingJobsCount = DataRetriever.GetCurrentJobsRunningCount(Properties.AgentsPoolId);
 
             if (waitingJobsCount == onlineAgentsCount)
             {
@@ -86,7 +60,7 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount, poolId);
+            Operations.WorkWithVmss(onlineAgentsCount, maxAgentsCount);
         }
     }
 }

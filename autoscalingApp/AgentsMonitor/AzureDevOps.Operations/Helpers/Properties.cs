@@ -1,5 +1,5 @@
-﻿using AzureDevOps.Operations.Classes;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using System;
+using AzureDevOps.Operations.Classes;
 using System.Configuration;
 using TableStorageClient.Classes;
 using TableStorageClient.Models;
@@ -13,8 +13,8 @@ namespace AzureDevOps.Operations.Helpers
             get
             {
                 var tableName = string.IsNullOrWhiteSpace(
-                    ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName]) 
-                    ? Constants.AzureStorageDefaultTrackingTableName 
+                    ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName])
+                    ? Constants.AzureStorageDefaultTrackingTableName
                     : ConfigurationManager.AppSettings[Constants.AzureStorageTrackingTableSettingName];
 
                 if (IsDryRun)
@@ -56,7 +56,40 @@ namespace AzureDevOps.Operations.Helpers
             }
         }
 
+        private static int _agentsPoolId;
+        /// <summary>
+        /// Stores in backing field agent pool id to minimize calls to Azure DevOps API
+        /// </summary>
+        internal static int AgentsPoolId
+        {
+            get
+            {
+                if (_agentsPoolId != 0)
+                {
+                    //we have correct value in backing field (this code assumes that it is not possible to have pool ID 0)
+                    return _agentsPoolId;
+                }
 
+                _agentsPoolId = GetTypedSetting.GetSetting<int>(Constants.AgentsPoolIdSettingName);
+
+                //if poolId is not defined in settings - we need to retrieve it
+                if (_agentsPoolId != 0)
+                {
+                    return _agentsPoolId;
+                }
+                var agentsPoolName = ConfigurationManager.AppSettings[Constants.AgentsPoolNameSettingName];
+                var poolIdNullable = Checker.DataRetriever.GetPoolId(agentsPoolName);
+                if (poolIdNullable == null)
+                {
+                    //something went wrong 
+                    Console.WriteLine($"Could not retrieve pool id for {agentsPoolName}, have to exit");
+                    LeaveTheBuilding.Exit(Checker.DataRetriever);
+                }
+                _agentsPoolId = poolIdNullable.Value;
+
+                return _agentsPoolId;
+            }
+        }
 
     }
 }
