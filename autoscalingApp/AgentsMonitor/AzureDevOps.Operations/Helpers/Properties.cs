@@ -34,7 +34,7 @@ namespace AzureDevOps.Operations.Helpers
         private static string StorageConnectionString =>
             ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];
 
-        private static TableOperations<ScaleEventEntity> actionsTrackingOperations;
+        private static TableOperations<ScaleEventEntity> _actionsTrackingOperations;
 
         public static TableOperations<ScaleEventEntity> ActionsTrackingOperations
         {
@@ -46,13 +46,13 @@ namespace AzureDevOps.Operations.Helpers
                     return null;
                 }
 
-                if (actionsTrackingOperations != null)
+                if (_actionsTrackingOperations != null)
                 {
-                    return actionsTrackingOperations;
+                    return _actionsTrackingOperations;
                 }
 
-                actionsTrackingOperations = new TableOperations<ScaleEventEntity>(StorageTableName, StorageConnectionString);
-                return actionsTrackingOperations;
+                _actionsTrackingOperations = new TableOperations<ScaleEventEntity>(StorageTableName, StorageConnectionString);
+                return _actionsTrackingOperations;
             }
         }
 
