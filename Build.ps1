@@ -10,7 +10,9 @@ Param(
     $ManagedImageResourceGroupName = $env:ManagedImageResourceGroupName,
     $ManagedImageName = $env:ManagedImageName,
     [switch]$InstallPrerequisites,
-    [switch]$EnforceAzureRm
+    [switch]$EnforceAzureRm,
+    #if true - will keep resources in Azure for investigation
+    [switch]$abortPackerOnError
 )
 
 Set-StrictMode -Version Latest
@@ -47,8 +49,10 @@ if ($env:BUILD_REPOSITORY_LOCALPATH) {
 
 $commitId = $(git log --pretty=format:'%H' -n 1)
 "CommitId: $commitId"
-  
-packer build `
+
+
+if ($abortPackerOnError) {
+    packer build `
     -var "commit_id=$commitId" `
     -var "client_id=$ClientId" `
     -var "client_secret=$ClientSecret" `
@@ -60,6 +64,20 @@ packer build `
     -var "managed_image_name=$ManagedImageName" `
     -on-error=abort `
     $PackerFile
+} else {
+    packer build `
+    -var "commit_id=$commitId" `
+    -var "client_id=$ClientId" `
+    -var "client_secret=$ClientSecret" `
+    -var "tenant_id=$TenantId" `
+    -var "subscription_id=$SubscriptionId" `
+    -var "object_id=$ObjectId" `
+    -var "location=$Location" `
+    -var "managed_image_resource_group_name=$ManagedImageResourceGroupName" `
+    -var "managed_image_name=$ManagedImageName" `
+    $PackerFile
+}
+
 
 if ($LASTEXITCODE -eq 1){
     Write-Error "Packer build faild"
