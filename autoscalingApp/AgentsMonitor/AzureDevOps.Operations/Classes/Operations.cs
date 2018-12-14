@@ -1,15 +1,14 @@
 ﻿using AzureDevOps.Operations.Helpers;
+using AzureDevOps.Operations.Models;
+using Microsoft.Azure.Management.Compute.Fluent;
 using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
-using AzureDevOps.Operations.Models;
-using Microsoft.Azure.Management.Compute.Fluent;
 using TableStorageClient.Models;
 
 namespace AzureDevOps.Operations.Classes
@@ -25,6 +24,18 @@ namespace AzureDevOps.Operations.Classes
         /// <param name="agentsPoolId"></param>
         public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool)
         {
+            //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
+            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
+            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
+            var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
+
+            if (amountOfAgents == 0)
+            {
+                //nevertheless - should we (de)provision agents: we are at boundaries
+                Console.WriteLine("Could not add/remove more agents, exiting...");
+                return;
+            }
+
             var credentials = AzureCreds();
 
             var azure = Azure
@@ -45,21 +56,10 @@ namespace AzureDevOps.Operations.Classes
             var virtualMachines = vmss.VirtualMachines.List()
                 .Select(vmssVm => new ScaleSetVirtualMachineStripped
                 {
-                    VmInstanceId = vmssVm.InstanceId, 
+                    VmInstanceId = vmssVm.InstanceId,
                     VmName = vmssVm.ComputerName,
                     VmInstanceState = vmssVm.PowerState
                 }).ToList();
-            //get jobs again to check, if we could deallocate a VM in VMSS (if it is running a job - it is not wise to deallocate it)
-            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
-            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
-            var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
-
-            if (amountOfAgents == 0)
-            {
-                //nevertheless - should we (de)provision agents: we are at boundaries
-                Console.WriteLine("Could not add/remove more agents, exiting...");
-                return;
-            }
 
 #pragma warning disable 4014
             //I wish this record to be processed on it's own; it is just tracking
@@ -130,7 +130,7 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-            var entity = new ScaleEventEntity(vmScaleSetName) {IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount};
+            var entity = new ScaleEventEntity(vmScaleSetName) { IsProvisioningEvent = isProvisioning, AmountOfVms = agentsCount };
 
             await Properties.ActionsTrackingOperations.InsertOrReplaceEntityAsync(entity);
         }
