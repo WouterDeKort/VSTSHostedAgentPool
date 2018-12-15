@@ -30,8 +30,13 @@ namespace AzureDevOps.Operations.Helpers
 
             var amountOfAgents = Math.Abs(runningJobs - agentsCount);
 
-            
+            var dynamicProperties = new DynamicProps();
 
+            if (dynamicProperties.WeAreInsideBusinessTime && runningJobs <= Properties.AmountOfAgents)
+            {
+                //we shall keep amount of agents, specified in AzureDevOps.Operations.Helpers.Properties.AmountOfAgents online
+                return 0;
+            }
             return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 

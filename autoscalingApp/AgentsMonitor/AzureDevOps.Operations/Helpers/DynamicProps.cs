@@ -10,7 +10,7 @@ namespace AzureDevOps.Operations.Helpers
         /// <summary>
         /// checks, if we are situated inside business times, defined in settings
         /// </summary>
-        internal bool WeAreInsideBusinessTime
+        public bool WeAreInsideBusinessTime
         {
             get
             {
@@ -21,7 +21,7 @@ namespace AzureDevOps.Operations.Helpers
                 }
 
                 var currentTime = Clock.Now;
-
+                //checks that current time falls in defined values
                 return (currentTime.DayOfWeek >= Properties.BusinessDaysStartingDay 
                         && currentTime.DayOfWeek <= Properties.BusinessDaysLastDay
                         && currentTime.Hour >= Properties.BussinesDayStartHour
