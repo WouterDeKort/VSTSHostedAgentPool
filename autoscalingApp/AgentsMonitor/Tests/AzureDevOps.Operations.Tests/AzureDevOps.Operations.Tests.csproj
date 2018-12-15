@@ -106,6 +106,7 @@
     <Compile Include="Classes\RetrieveTests.cs" />
     <Compile Include="Data\TestsConstants.cs" />
     <Compile Include="Helpers\DecisionsTest.cs" />
+    <Compile Include="Helpers\PropertiesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

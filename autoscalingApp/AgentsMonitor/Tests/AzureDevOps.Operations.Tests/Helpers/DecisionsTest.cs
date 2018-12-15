@@ -83,7 +83,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
         public static void AmountOfAgentsWithBusinessTimesSet(int jobsCount, int agentsCount, int maxAgentsCount, string currentDateTime, int expectedAmount)
         {
             ConfigurationManager.AppSettings[Constants.BusinessHoursRangeSettingName] = "10-17";
-            ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName] = "Mon-Fri";
+            ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName] = "Monday-Friday";
             ConfigurationManager.AppSettings[Constants.BusinessHoursAgentsAmountSettingName] = "3";
 
             var amount = Decisions.HowMuchAgents(jobsCount, agentsCount, maxAgentsCount);

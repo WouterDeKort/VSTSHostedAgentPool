@@ -45,7 +45,7 @@ Currently, settings are set in App.config (or one can use ARM template in arm-te
 
 ```BusinessHours_range``` - if here business hours is specified, then at this time (in timezone of web app) minimal amount of agents, specified in ```BusinessHours_agents``` will be kept online.
 
-```BusinessHours_days``` - on days specified here in between hours specified at ```BusinessHours_range``` minimal amount of agents, specified in ```BusinessHours_agents``` will be kept online.
+```BusinessHours_days``` - on days specified here in between hours specified at ```BusinessHours_range``` minimal amount of agents, specified in ```BusinessHours_agents``` will be kept online. Values must be formalized and only range accepted (first day, followed by dash, and last day). Example: ```Monday-Friday```
 
 ```BusinessHours_agents``` -  on days specified in ```BusinessHours_days``` in between hours specified at ```BusinessHours_range``` minimal amount of agents count will be kept online.
 

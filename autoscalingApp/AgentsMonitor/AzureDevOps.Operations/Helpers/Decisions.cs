@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using AzureDevOps.Operations.Classes;
 using AzureDevOps.Operations.Models;
 
 namespace AzureDevOps.Operations.Helpers
@@ -27,6 +29,8 @@ namespace AzureDevOps.Operations.Helpers
             }
 
             var amountOfAgents = Math.Abs(runningJobs - agentsCount);
+
+            
 
             return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }

@@ -18,6 +18,6 @@
     "AzureVMSSName": {"value": "SET-YOURS-HERE"},
     "IsDryRun": {"value": true},
     "businessHours": {"value": "10-17"},
-    "businessDays": {"value": "Mon-Fri"},
+    "businessDays": {"value": "Monday-Friday"},
     "businessAgentsAmount": {"value": "2"}
 }

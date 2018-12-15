@@ -1,5 +1,5 @@
-﻿using System;
-using AzureDevOps.Operations.Classes;
+﻿using AzureDevOps.Operations.Classes;
+using System;
 using System.Configuration;
 using TableStorageClient.Classes;
 using TableStorageClient.Models;
@@ -93,5 +93,104 @@ namespace AzureDevOps.Operations.Helpers
             }
         }
 
+        /// <summary>
+        /// Checks, if business runtime settings are defined 
+        /// </summary>
+        internal static bool BusinessRuntimeDefined => !string.IsNullOrWhiteSpace(
+                                                          ConfigurationManager.AppSettings[Constants.BusinessHoursRangeSettingName])
+                                                      && !string.IsNullOrWhiteSpace(
+                                                          ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName])
+                                                      && !string.IsNullOrWhiteSpace(
+                                                          ConfigurationManager.AppSettings[Constants.BusinessHoursAgentsAmountSettingName]);
+        /// <summary>
+        /// Gets starting day for business days
+        /// </summary>
+        public static DayOfWeek BusinessDaysStartingDay
+        {
+            get
+            {
+                var setting = ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName];
+                if (!setting.Contains("-"))
+                {
+                    return DayOfWeek.Monday;
+                }
+                var startingDayAsString = setting.Split('-')[0];
+                var possibleDay = DayParser(startingDayAsString);
+
+                return possibleDay ?? DayOfWeek.Monday;
+            }
+        }
+        /// <summary>
+        /// Gets ending day for business days
+        /// </summary>
+        public static DayOfWeek BusinessDaysLastDay
+        {
+            get
+            {
+                var setting = ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName];
+                if (!setting.Contains("-"))
+                {
+                    return DayOfWeek.Friday;
+                }
+                var endingDayAsString = setting.Split('-')[1];
+                var possibleDay = DayParser(endingDayAsString);
+
+                return possibleDay ?? DayOfWeek.Friday;
+            }
+        }
+
+        /// <summary>
+        /// Gets starting hour of a business day
+        /// </summary>
+        public static int BussinesDayStartHour
+        {
+            get
+            {
+                var setting = ConfigurationManager.AppSettings[Constants.BusinessHoursRangeSettingName];
+                if (!setting.Contains("-"))
+                {
+                    return 0;
+                }
+
+                var hourAsString = setting.Split('-')[0];
+
+                return int.TryParse(hourAsString, out var returnValue) ? returnValue : 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets last hour of a business day
+        /// </summary>
+        public static int BussinesDayEndHour
+        {
+            get
+            {
+                var setting = ConfigurationManager.AppSettings[Constants.BusinessHoursRangeSettingName];
+                if (!setting.Contains("-"))
+                {
+                    return 0;
+                }
+
+                var hourAsString = setting.Split('-')[1];
+
+                return int.TryParse(hourAsString, out var returnValue) ? returnValue : 0;
+            }
+        }
+        /// <summary>
+        /// Parses amount of agents
+        /// </summary>
+        public static int AmountOfAgents => GetTypedSetting.GetSetting<int>(Constants.BusinessHoursAgentsAmountSettingName);
+
+        private static DayOfWeek? DayParser(string day)
+        {
+            if (Enum.TryParse(day, true, out DayOfWeek returnValue))
+            {
+                return returnValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
