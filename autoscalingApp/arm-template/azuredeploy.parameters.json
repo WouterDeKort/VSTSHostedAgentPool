@@ -16,5 +16,8 @@
     "AzureSubscriptionId": {"value": "SET-YOURS-HERE"},
     "AzureVMSSResourceGroup": {"value": "SET-YOURS-HERE"},
     "AzureVMSSName": {"value": "SET-YOURS-HERE"},
-    "IsDryRun": {"value": true}
+    "IsDryRun": {"value": true},
+    "businessHours": {"value": "10-17"},
+    "businessDays": {"value": "Mon-Fri"},
+    "businessAgentsAmount": {"value": "2"}
 }
