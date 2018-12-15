@@ -24,25 +24,11 @@ namespace AzureDevOps.Operations.Classes
         /// <param name="areWeCheckingToStartVmInVmss">Describes, which functions calls out - provisioning or deprovisioning</param>
         public static void WorkWithVmss(int onlineAgents, int maxAgentsInPool, bool areWeCheckingToStartVmInVmss)
         {
-            var credentials = AzureCreds();
-
-            var azure = Azure
-                .Configure()
-                .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
-                .Authenticate(credentials)
-                .WithSubscription(ConfigurationManager.AppSettings[Constants.AzureSubscriptionIdSettingName]);
 
             //working with VMSS
             var resourceGroupName = ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
             var vmssName = ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
-            var vmss = azure.VirtualMachineScaleSets.GetByResourceGroup(resourceGroupName, vmssName);
-            if (vmss == null)
-            {
-                Console.WriteLine($"Could not retrieve Virtual Machines Scale Set with name {vmssName} in resource group {resourceGroupName}. Exiting...");
-                LeaveTheBuilding.Exit(Checker.DataRetriever);
-                //return statement does not have any sense here, but it save
-                return;
-            }
+            var vmss = GetVirtualMachinesScaleSet(resourceGroupName, vmssName);
             var virtualMachines = vmss.VirtualMachines.List()
                 //there could be failed VMs during provisioning
                 .Where(vm => !vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase))
@@ -51,7 +37,7 @@ namespace AzureDevOps.Operations.Classes
                     VmInstanceId = vmssVm.InstanceId,
                     VmName = vmssVm.ComputerName,
                     VmInstanceState = vmssVm.PowerState
-                }).ToList();
+                });
 
             //get jobs again to check, if we could deallocate a VM in VMSS
             //(if it is running a job - it is not wise to deallocate it)
@@ -76,56 +62,7 @@ namespace AzureDevOps.Operations.Classes
             //I wish this record to be processed on it's own; it is just tracking
             RecordDataInTable(vmssName, addMoreAgents, amountOfAgents);
 
-            if (!addMoreAgents)
-            {
-                Console.WriteLine("Deallocating VMs");
-                //we need to downscale, only running VMs shall be selected here
-                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), currentJobs);
-
-                foreach (var instanceId in instanceIdCollection)
-                {
-                    Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
-                    if (!Properties.IsDryRun)
-                    {
-                        vmss.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(resourceGroupName, vmssName,
-                            instanceId);
-                    }
-                }
-                //if we are deprovisioning - it is some time to do some housekeeping as well
-                if (!Properties.IsDryRun)
-                {
-                    var failedVms = vmss.VirtualMachines.List().Where(vm =>
-                        vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase)).ToArray();
-
-                    if (failedVms.Any())
-                    {
-                        Console.WriteLine("We have some failed VMs and will try to reimage them async");
-                        ReimageFailedVm(failedVms);
-                    }
-                }
-                
-
-            }
-            else
-            {
-                var virtualMachinesCounter = 0;
-                Console.WriteLine("Starting more VMs");
-                foreach (var scaleSetVirtualMachineStripped in virtualMachines.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
-                {
-                    if (virtualMachinesCounter >= amountOfAgents)
-                    {
-                        break;
-                    }
-                    Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
-                    if (!Properties.IsDryRun)
-                    {
-                        vmss.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(resourceGroupName, vmssName,
-                            scaleSetVirtualMachineStripped.VmInstanceId);
-                    }
-                    virtualMachinesCounter++;
-                }
-            }
-            Console.WriteLine("Finished execution");
+            WorkWithScaleSet(addMoreAgents, virtualMachines, currentJobs, resourceGroupName, vmssName, vmss, amountOfAgents);
         }
 
         private static AzureCredentials AzureCreds()
@@ -135,6 +72,90 @@ namespace AzureDevOps.Operations.Classes
             var tenantId = ConfigurationManager.AppSettings[Constants.AzureServicePrincipleTenantIdSettingName];
             //maybe in future I'll need to extend this one to allow other then Global Azure environment
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
+        }
+
+        private static IVirtualMachineScaleSet GetVirtualMachinesScaleSet(string rgName,
+            string virtualMachinesScaleSetName)
+        {
+            var credentials = AzureCreds();
+
+            var azure = Azure
+                .Configure()
+                .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
+                .Authenticate(credentials)
+                .WithSubscription(ConfigurationManager.AppSettings[Constants.AzureSubscriptionIdSettingName]);
+            var virtualMachineScaleSet = azure.VirtualMachineScaleSets.GetByResourceGroup(rgName, virtualMachinesScaleSetName);
+            if (virtualMachineScaleSet != null)
+            {
+                return virtualMachineScaleSet;
+            }
+            Console.WriteLine($"Could not retrieve Virtual Machines Scale Set with name {virtualMachinesScaleSetName} in resource group {rgName}. Exiting...");
+            LeaveTheBuilding.Exit(Checker.DataRetriever);
+
+            return null;
+        }
+
+        /// <summary>
+        /// This method will perform all changes to scale set
+        /// </summary>
+        private static void WorkWithScaleSet(bool addingMore, 
+            IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped, 
+            JobRequest[] executingJobs,
+            string rgName, string scaleSetName, IVirtualMachineScaleSet scaleSet, int agentsLimit)
+        {
+            if (!addingMore)
+            {
+                Console.WriteLine("Deallocating VMs");
+                //we need to downscale, only running VMs shall be selected here
+                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
+
+                foreach (var instanceId in instanceIdCollection)
+                {
+                    Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
+                    if (!Properties.IsDryRun)
+                    {
+                        scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(rgName, scaleSetName,
+                            instanceId);
+                    }
+                }
+                //if we are deprovisioning - it is some time to do some housekeeping as well
+                if (Properties.IsDryRun)
+                {
+                    return;
+                }
+                {
+                    var failedVms = scaleSet.VirtualMachines.List().Where(vm =>
+                        vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                    if (!failedVms.Any())
+                    {
+                        return;
+                    }
+                    Console.WriteLine("We have some failed VMs and will try to reimage them async");
+                    ReimageFailedVm(failedVms);
+                }
+
+
+            }
+            else
+            {
+                var virtualMachinesCounter = 0;
+                Console.WriteLine("Starting more VMs");
+                foreach (var scaleSetVirtualMachineStripped in virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
+                {
+                    if (virtualMachinesCounter >= agentsLimit)
+                    {
+                        break;
+                    }
+                    Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
+                    if (!Properties.IsDryRun)
+                    {
+                        scaleSet.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(rgName, scaleSetName,
+                            scaleSetVirtualMachineStripped.VmInstanceId);
+                    }
+                    virtualMachinesCounter++;
+                }
+            }
         }
 
         private static async void RecordDataInTable(string vmScaleSetName, bool isProvisioning, int agentsCount)
