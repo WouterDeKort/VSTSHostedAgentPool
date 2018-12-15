@@ -1,17 +1,12 @@
-﻿using System;
-using AzureDevOps.Operations.Classes;
+﻿using AzureDevOps.Operations.Helpers;
 using Microsoft.Azure.WebJobs;
-using System.Configuration;
-using System.IO;
 using System.Net;
-using System.Net.Http;
-using AzureDevOps.Operations.Helpers;
 
 namespace AutoScaler
 {
-    class Program
+    internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
             //little bit of security
             //enabling TLS 1.2

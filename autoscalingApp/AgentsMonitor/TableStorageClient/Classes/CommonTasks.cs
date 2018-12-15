@@ -14,16 +14,7 @@ namespace TableStorageClient.Classes
 
             var table = tableClient.GetTableReference(tableName);
 
-            try
-            {
-                //if table does not exist - create it 
-                await table.CreateIfNotExistsAsync();
-            }
-            catch (Exception ex)
-            {
-                //empty catch is useful for debugging
-                throw;
-            }
+            await table.CreateIfNotExistsAsync();
 
             return table;
         }

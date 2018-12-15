@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace AzureDevOps.Operations.Helpers
 {
-    public class GetTypedSetting
+    public static class GetTypedSetting
     {
         /// <summary>
         /// Got this example from https://dejanstojanovic.net/aspnet/2015/may/reading-config-value-to-a-proper-data-type/

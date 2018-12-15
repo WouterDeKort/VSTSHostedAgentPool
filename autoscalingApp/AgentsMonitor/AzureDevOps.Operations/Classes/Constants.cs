@@ -1,6 +1,6 @@
 ﻿namespace AzureDevOps.Operations.Classes
 {
-    public class Constants
+    public static class Constants
     {
         /// <summary>
         /// Defines error exit code

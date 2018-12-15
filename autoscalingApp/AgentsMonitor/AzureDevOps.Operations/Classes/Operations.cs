@@ -54,7 +54,7 @@ namespace AzureDevOps.Operations.Classes
                 }).ToList();
 
             //get jobs again to check, if we could deallocate a VM in VMSS
-            //(if it is running a job - it is not wise to deallocate it;
+            //(if it is running a job - it is not wise to deallocate it)
             //since getting VMMS is potentially lengthy operation - we could need this)
             var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
             var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
@@ -73,10 +73,8 @@ namespace AzureDevOps.Operations.Classes
                 return;
             }
 
-#pragma warning disable 4014
             //I wish this record to be processed on it's own; it is just tracking
             RecordDataInTable(vmssName, addMoreAgents, amountOfAgents);
-#pragma warning restore 4014
 
             if (!addMoreAgents)
             {
@@ -102,9 +100,7 @@ namespace AzureDevOps.Operations.Classes
                     if (failedVms.Any())
                     {
                         Console.WriteLine("We have some failed VMs and will try to reimage them async");
-#pragma warning disable 4014
                         ReimageFailedVm(failedVms);
-#pragma warning restore 4014
                     }
                 }
                 
@@ -141,7 +137,7 @@ namespace AzureDevOps.Operations.Classes
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
-        private static async Task RecordDataInTable(string vmScaleSetName, bool isProvisioning, int agentsCount)
+        private static async void RecordDataInTable(string vmScaleSetName, bool isProvisioning, int agentsCount)
         {
             var storageConnectionString = ConfigurationManager.AppSettings[Constants.AzureStorageConnectionStringName];
 
@@ -168,7 +164,7 @@ namespace AzureDevOps.Operations.Classes
         /// </summary>
         /// <param name="failedVirtualMachines"></param>
         /// <returns></returns>
-        private static async Task ReimageFailedVm(IEnumerable<IVirtualMachineScaleSetVM> failedVirtualMachines)
+        private static async void ReimageFailedVm(IEnumerable<IVirtualMachineScaleSetVM> failedVirtualMachines)
         {
             foreach (var virtualMachineScaleSetVm in failedVirtualMachines)
             {

@@ -3,7 +3,7 @@ using Microsoft.Azure.WebJobs;
 
 namespace AutoScaler
 {
-    public class Functions
+    public static class Functions
     {
         /// <summary>
         /// Deprovisioning trigger shall run less frequently than provisioning one

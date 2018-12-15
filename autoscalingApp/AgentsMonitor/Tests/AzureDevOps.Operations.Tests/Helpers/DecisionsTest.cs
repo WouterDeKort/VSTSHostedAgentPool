@@ -13,7 +13,7 @@ using Microsoft.Azure.Management.Compute.Fluent;
 
 namespace AzureDevOps.Operations.Tests.Helpers
 {
-    public class DecisionsTest
+    public static class DecisionsTest
     {
         [TestCase(2, 1, true, Description = "There is 2 jobs, and 1 agent - we shall upscale")]
         [TestCase(1, 2, false, Description = "There is 1 job, and 2 agent - we shall downscale")]
