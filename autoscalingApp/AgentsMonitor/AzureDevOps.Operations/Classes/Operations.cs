@@ -63,7 +63,7 @@ namespace AzureDevOps.Operations.Classes
             if (amountOfAgents == 0)
             {
                 //nevertheless - should we (de)provision agents: we are at boundaries
-                Console.WriteLine("Could not add/remove more agents, exiting...");
+                Console.WriteLine("Should not add/remove more agents...");
                 return;
             }
 

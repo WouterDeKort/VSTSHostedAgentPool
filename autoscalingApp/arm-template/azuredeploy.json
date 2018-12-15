@@ -198,6 +198,27 @@
         "metadata": {
             "description": "Table to create (de)provisining records"
         }
+    },
+    "businessHours": {
+      "type": "string",
+      "defaultValue": "10-17",
+      "metadata": {
+        "description": "Defines business hours, when minimal amount of agents shall be running"
+      }
+    },
+    "businessDays": {
+      "type": "string",
+      "defaultValue": "Mon-Fri",
+      "metadata": {
+        "description": "Defines business days, when minimal amount of agents shall be running"
+      }
+    },
+    "businessAgentsAmount": {
+      "type": "string",
+      "defaultValue": "2",
+      "metadata": {
+        "description": "Defines amount of agents, which shall be kept online during business days"
+      }
     }
   },
   "variables": {
@@ -307,7 +328,10 @@
                 "Azure_VMSS_Name",
                 "DryRunExecution",
                 "Azure_Storage_ConnectionString",
-                "Azure_Storage_ActionsTracking_TableName"
+                "Azure_Storage_ActionsTracking_TableName",
+                "BusinessHours_range",
+                "BusinessHours_days",
+                "BusinessHours_agents"
               ]
             }
           },
@@ -334,7 +358,10 @@
               "Azure_VMSS_Name": "[parameters('AzureVMSSName')]",
               "DryRunExecution": "[parameters('IsDryRun')]",
               "Azure_Storage_ConnectionString": "[concat(variables('storageConnectionStringPrefix'), listkeys(variables('storageId'), variables('storageAccountApiVersion')).key1)]",
-              "Azure_Storage_ActionsTracking_TableName": "[parameters('defaultTrackingTableName')]"
+              "Azure_Storage_ActionsTracking_TableName": "[parameters('defaultTrackingTableName')]",
+              "BusinessHours_range": "[parameters('businessHours')]",
+              "BusinessHours_days": "[parameters('businessDays')]",
+              "BusinessHours_agents": "[parameters('businessAgentsAmount')]"
             }
           }
       ]

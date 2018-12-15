@@ -169,7 +169,9 @@
     <Compile Include="Classes\Operations.cs" />
     <Compile Include="Classes\Retrieve.cs" />
     <Compile Include="Helpers\Decisions.cs" />
+    <Compile Include="Helpers\DynamicProps.cs" />
     <Compile Include="Helpers\LeaveTheBuilding.cs" />
+    <Compile Include="Helpers\Mockable\Clock.cs" />
     <Compile Include="Helpers\SettingsChecker.cs" />
     <Compile Include="Helpers\GetData.cs" />
     <Compile Include="Helpers\GetTypedSetting.cs" />

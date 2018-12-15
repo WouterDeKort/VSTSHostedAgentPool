@@ -43,6 +43,12 @@ Currently, settings are set in App.config (or one can use ARM template in arm-te
 
 ```Azure_Storage_ActionsTracking_TableName``` - table name to store runtime data in. If empty and connection string ```Azure_Storage_ConnectionString``` specified - then it will default to ```DefaultTrackingTable```.
 
+```BusinessHours_range``` - if here business hours is specified, then at this time (in timezone of web app) minimal amount of agents, specified in ```BusinessHours_agents``` will be kept online.
+
+```BusinessHours_days``` - on days specified here in between hours specified at ```BusinessHours_range``` minimal amount of agents, specified in ```BusinessHours_agents``` will be kept online. Values must be formalized and only range accepted (first day, followed by dash, and last day). Example: ```Monday-Friday```
+
+```BusinessHours_agents``` -  on days specified in ```BusinessHours_days``` in between hours specified at ```BusinessHours_range``` minimal amount of agents count will be kept online.
+
 As will all Web Jobs - you need to specify connection strings to Azure Storage (they are used behind the scenes for logging and time tracking).
 
 They must be specified in following connection strings: ```AzureWebJobsDashboard``` and ```AzureWebJobsStorage```.

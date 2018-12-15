@@ -6,7 +6,6 @@
         /// Defines error exit code
         /// </summary>
         public const int ErrorExitCode = -1;
-        public const int SuccessExitCode = 0;
         public const string AzureDevOpsApiVersion = "4.1";
         /// <summary>
         /// Agents Pool Name
@@ -66,5 +65,17 @@
         /// if tracking table name is not set in appSettings - it will default to this
         /// </summary>
         public const string AzureStorageDefaultTrackingTableName = "DefaultTrackingTable";
+        /// <summary>
+        /// Setting name to retrieve Business Hours
+        /// </summary>
+        public const string BusinessHoursRangeSettingName = "BusinessHours_range";
+        /// <summary>
+        /// Setting name to retrieve Business days
+        /// </summary>
+        public const string BusinessHoursDaysSettingName = "BusinessHours_days";
+        /// <summary>
+        /// Setting name to retrieve minimal amount of agents running during business time
+        /// </summary>
+        public const string BusinessHoursAgentsAmountSettingName = "BusinessHours_agents";
     }
 }

@@ -89,6 +89,7 @@
       <HintPath>..\..\packages\RichardSzalay.MockHttp.5.0.0\lib\net45\RichardSzalay.MockHttp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http.WebRequest" />
@@ -103,8 +104,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\RetrieveTests.cs" />
+    <Compile Include="Classes\TestInitilizers.cs" />
     <Compile Include="Data\TestsConstants.cs" />
     <Compile Include="Helpers\DecisionsTest.cs" />
+    <Compile Include="Helpers\DynamicPropsTests.cs" />
+    <Compile Include="Helpers\PropertiesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
