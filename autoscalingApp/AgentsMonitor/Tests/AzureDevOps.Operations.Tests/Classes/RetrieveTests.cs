@@ -64,7 +64,7 @@ namespace AzureDevOps.Operations.Tests.Classes
 
             var response = File.Exists(jsonPathCombined) ? File.ReadAllText(jsonPathCombined) : string.Empty;
 
-            var request = mockHttp.When("*").Respond("application/json", response);
+            mockHttp.When("*").Respond("application/json", response);
             var client = mockHttp.ToHttpClient();
             return new Retrieve(TestsConstants.TestOrganizationName, TestsConstants.TestToken,
                 client);

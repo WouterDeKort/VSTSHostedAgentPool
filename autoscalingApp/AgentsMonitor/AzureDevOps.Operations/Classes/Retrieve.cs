@@ -6,7 +6,7 @@ using System.Net.Http;
 
 namespace AzureDevOps.Operations.Classes
 {
-    public class Retrieve : IDisposable
+    public sealed class Retrieve : IDisposable
     {
         /// <summary>
         /// Organization agentsPoolName in Azure DevOps

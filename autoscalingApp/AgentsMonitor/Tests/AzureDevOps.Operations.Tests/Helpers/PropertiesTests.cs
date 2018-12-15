@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace AzureDevOps.Operations.Tests.Helpers
 {
-    public class PropertiesTests
+    public static class PropertiesTests
     {
         [TestCase("Monday-Friday", DayOfWeek.Monday, DayOfWeek.Friday)]
         [TestCase("Monday-Monday", DayOfWeek.Monday, DayOfWeek.Monday)]
