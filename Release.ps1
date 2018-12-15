@@ -75,7 +75,7 @@ $vnet = New-AzureRmVirtualNetwork `
     -Subnet $subnet `
     -Force
 
-$publicIP = Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName $pipRg -ev pipNotPresent -ea 0;
+Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName $pipRg -ev pipNotPresent -ea 0;
 if ($pipNotPresent){
     Write-Host "Create a public IP address"
     $publicIP = New-AzureRmPublicIpAddress `
@@ -84,6 +84,8 @@ if ($pipNotPresent){
         -AllocationMethod Static `
         -Name $pipName `
         -Force
+} else {
+    $publicIP = Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName $pipRg
 }
 
 SetCustomTagOnResource -resourceId $publicIP.Id;
