@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Threading.Tasks;
 using TableStorageClient.Models;
 
 namespace AzureDevOps.Operations.Classes
@@ -98,8 +97,8 @@ namespace AzureDevOps.Operations.Classes
         /// <summary>
         /// This method will perform all changes to scale set
         /// </summary>
-        private static void WorkWithScaleSet(bool addingMore, 
-            IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped, 
+        private static void WorkWithScaleSet(bool addingMore,
+            IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped,
             JobRequest[] executingJobs,
             string rgName, string scaleSetName, IVirtualMachineScaleSet scaleSet, int agentsLimit)
         {
@@ -108,33 +107,23 @@ namespace AzureDevOps.Operations.Classes
                 Console.WriteLine("Deallocating VMs");
                 //we need to downscale, only running VMs shall be selected here
                 var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
+                DeallocateVms(instanceIdCollection, scaleSet, rgName, scaleSetName);
 
-                foreach (var instanceId in instanceIdCollection)
-                {
-                    Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
-                    if (!Properties.IsDryRun)
-                    {
-                        scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(rgName, scaleSetName,
-                            instanceId);
-                    }
-                }
                 //if we are deprovisioning - it is some time to do some housekeeping as well
                 if (Properties.IsDryRun)
                 {
                     return;
                 }
+
+                var failedVms = scaleSet.VirtualMachines.List().Where(vm =>
+                    vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                if (!failedVms.Any())
                 {
-                    var failedVms = scaleSet.VirtualMachines.List().Where(vm =>
-                        vm.Inner.ProvisioningState.Equals("Failed", StringComparison.OrdinalIgnoreCase)).ToArray();
-
-                    if (!failedVms.Any())
-                    {
-                        return;
-                    }
-                    Console.WriteLine("We have some failed VMs and will try to reimage them async");
-                    ReimageFailedVm(failedVms);
+                    return;
                 }
-
+                Console.WriteLine("We have some failed VMs and will try to reimage them async");
+                ReimageFailedVm(failedVms);
 
             }
             else
@@ -154,6 +143,19 @@ namespace AzureDevOps.Operations.Classes
                             scaleSetVirtualMachineStripped.VmInstanceId);
                     }
                     virtualMachinesCounter++;
+                }
+            }
+        }
+
+        private static void DeallocateVms(IEnumerable<string> instanceIdCollection, IVirtualMachineScaleSet scaleSet, string rgName, string scaleSetName)
+        {
+            foreach (var instanceId in instanceIdCollection)
+            {
+                Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
+                if (!Properties.IsDryRun)
+                {
+                    scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(rgName, scaleSetName,
+                        instanceId);
                 }
             }
         }
