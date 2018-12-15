@@ -88,7 +88,7 @@ if ($pipNotPresent){
     $publicIP = Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName $pipRg
 }
 
-SetCustomTagOnResource -resourceId $publicIP.Id;
+SetCustomTagOnResource -resourceId $publicIP.Id -resourceName $pipName;
 
 Write-Host "Create a frontend and backend IP pool"
 $frontendIP = New-AzureRmLoadBalancerFrontendIpConfig `
@@ -116,7 +116,7 @@ $lb = New-AzureRmLoadBalancer `
     -InboundNatPool $inboundNATPool `
     -Force
 
-SetCustomTagOnResource -resourceId $lb.Id;
+SetCustomTagOnResource -resourceId $lb.Id -resourceName $lbName;
 
 Write-Host "Create a load balancer health probe on port 80"
 Add-AzureRmLoadBalancerProbeConfig -Name "HealthProbe" `
@@ -162,7 +162,7 @@ Set-AzureRmVmssStorageProfile $vmssConfig `
     -OsDiskOsType Windows `
     -ImageReferenceId $image.id
 
-SetCustomTagOnResource -resourceId $image.Id;    
+SetCustomTagOnResource -resourceId $image.Id -resourceName $ManagedImageName;    
 
 Write-Host "Set up information for authenticating with the virtual machine"
 Set-AzureRmVmssOsProfile $vmssConfig `
@@ -182,7 +182,7 @@ if ($attachNsg) {
     #add rule to allow ports
     $nsg | Add-AzureRmNetworkSecurityRuleConfig -Name Allow_Ports -Access Allow -Protocol Tcp -Direction Inbound -Priority 110 -SourceAddressPrefix $allowedIps.Split(',') -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange $allowedPorts.Split(',') | Set-AzureRmNetworkSecurityGroup
 
-    SetCustomTagOnResource -resourceId $nsg.Id;
+    SetCustomTagOnResource -resourceId $nsg.Id -resourceName $nsgName;
 
     #add NIC to VMSS
     Add-AzureRmVmssNetworkInterfaceConfiguration `
@@ -237,7 +237,7 @@ else {
     Write-Host "Storage account $StorageAccountName in $ManagedImageResourceGroupName already exists"
     $storage = Get-AzureRmStorageAccount -ResourceGroupName $ManagedImageResourceGroupName -Name $StorageAccountName;
 }
-SetCustomTagOnResource -resourceId $storage.Id;
+SetCustomTagOnResource -resourceId $storage.Id -resourceName $StorageAccountName;
 
 $StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $ManagedImageResourceGroupName -Name $StorageAccountName).Value[0]
 $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
@@ -293,6 +293,6 @@ Update-AzureRmVmss `
     -Name $vmssScaleSetName `
     -VirtualMachineScaleSet $vmss
 
-SetCustomTagOnResource -resourceId $vmss.Id;
+SetCustomTagOnResource -resourceId $vmss.Id -resourceName $vmssScaleSetName;
 
 Write-Host "Finished creating VM Scale Set and installing Agent"

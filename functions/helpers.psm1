@@ -1,6 +1,8 @@
 function SetCustomTagOnResource {
     param (
-        $resourceId
+        $resourceId,
+        #Get-AzureRmResource does not fetches us resource name :(
+        $resourceName
     )
 
     process {
@@ -12,11 +14,10 @@ function SetCustomTagOnResource {
         } 
         else 
         {
-            $rName = $azureResourceInfo.ResourceName;
             $rType = $azureResourceInfo.resourceType;
             $rRgName = $azureResourceInfo.ResourceGroupName;
-            Write-Verbose "Settings tags for $resourceId named $rName, belonging to type $rType in resource group $rRgName";
-            Set-AzureRmResource -Tag @{ billingCategory="DevProductivity"; environment="Dev"; resourceType="AzureDevOps" } -ResourceName $rName -ResourceType $rType -ResourceGroupName $rRgName -Force;
+            Write-Verbose "Settings tags for $resourceId named $resourceName, belonging to type $rType in resource group $rRgName";
+            Set-AzureRmResource -Tag @{ billingCategory="DevProductivity"; environment="Dev"; resourceType="AzureDevOps" } -ResourceName $resourceName -ResourceType $rType -ResourceGroupName $rRgName -Force;
         }
 
         Write-Verbose "Ended tags settings"
