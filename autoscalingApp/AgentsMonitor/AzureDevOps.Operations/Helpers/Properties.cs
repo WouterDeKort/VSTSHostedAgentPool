@@ -181,6 +181,10 @@ namespace AzureDevOps.Operations.Helpers
         /// </summary>
         public static int AmountOfAgents => GetTypedSetting.GetSetting<int>(Constants.BusinessHoursAgentsAmountSettingName);
 
+        public static string VmScaleSetResourceGroupName =>
+            ConfigurationManager.AppSettings[Constants.AzureVmssResourceGroupSettingName];
+        public static string VmScaleSetName => ConfigurationManager.AppSettings[Constants.AzureVmssNameSettingName];
+
         private static DayOfWeek? DayParser(string day)
         {
             if (Enum.TryParse(day, true, out DayOfWeek returnValue))
