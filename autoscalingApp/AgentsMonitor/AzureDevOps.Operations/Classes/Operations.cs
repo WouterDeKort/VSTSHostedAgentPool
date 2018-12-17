@@ -155,19 +155,20 @@ namespace AzureDevOps.Operations.Classes
 
         private static void AllocateVms(IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped, int agentsLimit, IVirtualMachineScaleSet scaleSet)
         {
-            var virtualMachinesCounter = 0;
+            var scaleSetVirtualMachineStripped = virtualMachinesStripped as ScaleSetVirtualMachineStripped[] ?? virtualMachinesStripped.ToArray();
+            var virtualMachinesCounter = scaleSetVirtualMachineStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Starting));
             Console.WriteLine("Starting more VMs");
-            foreach (var scaleSetVirtualMachineStripped in virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
+            foreach (var virtualMachineStripped in scaleSetVirtualMachineStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
             {
                 if (virtualMachinesCounter >= agentsLimit)
                 {
                     break;
                 }
-                Console.WriteLine($"Starting VM {scaleSetVirtualMachineStripped.VmName} with id {scaleSetVirtualMachineStripped.VmInstanceId}");
+                Console.WriteLine($"Starting VM {virtualMachineStripped.VmName} with id {virtualMachineStripped.VmInstanceId}");
                 if (!Properties.IsDryRun)
                 {
                     scaleSet.VirtualMachines.Inner.BeginStartWithHttpMessagesAsync(Properties.VmScaleSetResourceGroupName, Properties.VmScaleSetName,
-                        scaleSetVirtualMachineStripped.VmInstanceId);
+                        virtualMachineStripped.VmInstanceId);
                 }
                 virtualMachinesCounter++;
             }

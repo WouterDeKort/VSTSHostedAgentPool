@@ -115,7 +115,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
             Clock.TestApi.Now = () => TestInitilizers.ParseDateTimeForTest(testDateTime);
             var amount = Decisions.HowMuchAgents(jobsCount, agentsCount, maxAgentsCount);
 
-            Assert.AreEqual(amount, expectedAmount);
+            Assert.AreEqual(expectedAmount, amount);
             Clock.TestApi.Reset();
         }
 

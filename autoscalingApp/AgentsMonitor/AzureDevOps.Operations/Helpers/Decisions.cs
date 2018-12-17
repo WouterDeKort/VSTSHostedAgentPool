@@ -28,16 +28,19 @@ namespace AzureDevOps.Operations.Helpers
                 return 0;
             }
 
-            var amountOfAgents = Math.Abs(runningJobs - agentsCount);
+            var amountOfAgents = runningJobs - agentsCount;
 
             var dynamicProperties = new DynamicProps();
 
-            if (dynamicProperties.WeAreInsideBusinessTime && runningJobs <= Properties.AmountOfAgents)
+            if (dynamicProperties.WeAreInsideBusinessTime && amountOfAgents <= 0)
             {
-                //we shall keep amount of agents, specified in AzureDevOps.Operations.Helpers.Properties.AmountOfAgents online
-                return 0;
+                if (agentsCount <= Properties.AmountOfAgents)
+                {
+                    return Properties.AmountOfAgents - agentsCount;
+                }
+
             }
-            return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
+            return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : Math.Abs(amountOfAgents);
         }
 
         public static string[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)

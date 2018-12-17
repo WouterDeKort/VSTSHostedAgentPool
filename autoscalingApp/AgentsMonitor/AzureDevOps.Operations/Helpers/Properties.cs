@@ -177,7 +177,7 @@ namespace AzureDevOps.Operations.Helpers
             }
         }
         /// <summary>
-        /// Parses amount of agents
+        /// Parses amount of agents, required during business hours
         /// </summary>
         public static int AmountOfAgents => GetTypedSetting.GetSetting<int>(Constants.BusinessHoursAgentsAmountSettingName);
 
