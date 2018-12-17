@@ -57,7 +57,7 @@ namespace AzureDevOps.Operations.Classes
 
             var waitingJobsCount = DataRetriever.GetCurrentJobsRunningCount(Properties.AgentsPoolId);
 
-            if (waitingJobsCount == onlineAgentsCount)
+            if (waitingJobsCount == onlineAgentsCount && !new DynamicProps().WeAreInsideBusinessTime)
             {
                 //nothing to do here
                 return;
