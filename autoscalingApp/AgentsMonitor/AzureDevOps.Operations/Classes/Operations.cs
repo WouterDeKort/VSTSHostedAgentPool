@@ -66,7 +66,7 @@ namespace AzureDevOps.Operations.Classes
             }
             else
             {
-                DeallocationWorkWithScaleSet(virtualMachines, currentJobs, vmss, amountOfAgents);
+                DeallocationWorkWithScaleSet(virtualMachines, currentJobs, vmss);
             }           
         }
 
@@ -106,7 +106,7 @@ namespace AzureDevOps.Operations.Classes
         private static void DeallocationWorkWithScaleSet(
             IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped,
             JobRequest[] executingJobs,
-            IVirtualMachineScaleSet scaleSet, int agentsLimit)
+            IVirtualMachineScaleSet scaleSet)
         {
             Console.WriteLine("Deallocating VMs");
             //we need to downscale, only running VMs shall be selected here
