@@ -41,8 +41,6 @@ namespace AzureDevOps.Operations.Classes
             var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
             var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
             var addMoreAgents = amountOfAgents > 0;
-            //further I need to work with positive numbers only
-            amountOfAgents = Math.Abs(amountOfAgents);
 
             if (amountOfAgents == 0)
             {
@@ -50,6 +48,9 @@ namespace AzureDevOps.Operations.Classes
                 Console.WriteLine("Should not add/remove more agents...");
                 return;
             }
+
+            //further I need to work with positive numbers only
+            amountOfAgents = Math.Abs(amountOfAgents);
 
             if (addMoreAgents != areWeCheckingToStartVmInVmss)
             {
