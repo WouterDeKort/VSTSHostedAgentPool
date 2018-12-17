@@ -20,6 +20,7 @@ namespace AutoScaler
         /// Provision more agents shall be running more frequently to allow faster agents provisioning
         /// </summary>
         /// <param name="timer"></param>
+        [Singleton]
         public static void ProvisionTrigger([TimerTrigger("0 */2 * * * *", RunOnStartup = true)]
             TimerInfo timer)
         {
