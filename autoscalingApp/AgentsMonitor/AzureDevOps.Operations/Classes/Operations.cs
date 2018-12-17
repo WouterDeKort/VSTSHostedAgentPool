@@ -67,7 +67,7 @@ namespace AzureDevOps.Operations.Classes
             }
             else
             {
-                DeallocationWorkWithScaleSet(virtualMachines, currentJobs, vmss);
+                DeallocationWorkWithScaleSet(virtualMachines, currentJobs, vmss, amountOfAgents);
             }           
         }
 
@@ -107,12 +107,12 @@ namespace AzureDevOps.Operations.Classes
         private static void DeallocationWorkWithScaleSet(
             ScaleSetVirtualMachineStripped[] virtualMachinesStripped,
             JobRequest[] executingJobs,
-            IVirtualMachineScaleSet scaleSet)
+            IVirtualMachineScaleSet scaleSet, int agentsLimit)
         {
             Console.WriteLine("Deallocating VMs");
             //we need to downscale, only running VMs shall be selected here
             var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
-            DeallocateVms(instanceIdCollection, scaleSet);
+            DeallocateVms(instanceIdCollection, scaleSet, agentsLimit);
 
             //if we are deprovisioning - it is some time to do some housekeeping as well
             if (Properties.IsDryRun)
@@ -123,16 +123,22 @@ namespace AzureDevOps.Operations.Classes
             HouseKeeping(scaleSet);
         }
 
-        private static void DeallocateVms(IEnumerable<string> instanceIdCollection, IVirtualMachineScaleSet scaleSet)
+        private static void DeallocateVms(IEnumerable<string> instanceIdCollection, IVirtualMachineScaleSet scaleSet, int agentsCountToDeallocate)
         {
+            var virtualMachinesCounter = 0;
             foreach (var instanceId in instanceIdCollection)
             {
+                if (virtualMachinesCounter >= agentsCountToDeallocate)
+                {
+                    break;
+                }
                 Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
                 if (!Properties.IsDryRun)
                 {
                     scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(Properties.VmScaleSetResourceGroupName, Properties.VmScaleSetName,
                         instanceId);
                 }
+                virtualMachinesCounter++;
             }
         }
 
