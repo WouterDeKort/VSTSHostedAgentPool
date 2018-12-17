@@ -1,4 +1,6 @@
-﻿using AzureDevOps.Operations.Helpers;
+﻿using System.Configuration;
+using AzureDevOps.Operations.Classes;
+using AzureDevOps.Operations.Helpers;
 using AzureDevOps.Operations.Helpers.Mockable;
 using AzureDevOps.Operations.Tests.Classes;
 using NUnit.Framework;
@@ -10,6 +12,9 @@ namespace AzureDevOps.Operations.Tests.Helpers
         [Test]
         public void SettingsIsNotDefined()
         {
+            ConfigurationManager.AppSettings[Constants.BusinessHoursRangeSettingName] = "";
+            ConfigurationManager.AppSettings[Constants.BusinessHoursDaysSettingName] = "";
+            ConfigurationManager.AppSettings[Constants.BusinessHoursAgentsAmountSettingName] = "";
             var dynamicProp = new DynamicProps();
             Assert.IsFalse(dynamicProp.WeAreInsideBusinessTime);
         }

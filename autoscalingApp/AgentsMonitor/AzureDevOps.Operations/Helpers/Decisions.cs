@@ -9,17 +9,6 @@ namespace AzureDevOps.Operations.Helpers
 {
     public static class Decisions
     {
-        /// <summary>
-        /// If there is more jobs then agents - we need to add more; else - we need to downscale
-        /// </summary>
-        /// <param name="runningJobs"></param>
-        /// <param name="agentsCount"></param>
-        /// <returns></returns>
-        public static bool AddMoreAgents(int runningJobs, int agentsCount)
-        {
-            return runningJobs > agentsCount;
-        }
-
         public static int HowMuchAgents(int runningJobs, int agentsCount, int maxAgents)
         {
             if (agentsCount == maxAgents && runningJobs >= agentsCount)
@@ -40,7 +29,7 @@ namespace AzureDevOps.Operations.Helpers
                 }
 
             }
-            return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : Math.Abs(amountOfAgents);
+            return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 
         public static string[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)

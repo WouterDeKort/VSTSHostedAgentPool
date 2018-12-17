@@ -39,8 +39,10 @@ namespace AzureDevOps.Operations.Classes
             //(if it is running a job - it is not wise to deallocate it)
             //since getting VMMS is potentially lengthy operation - we could need this)
             var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
-            var addMoreAgents = Decisions.AddMoreAgents(currentJobs.Length, onlineAgents);
             var amountOfAgents = Decisions.HowMuchAgents(currentJobs.Length, onlineAgents, maxAgentsInPool);
+            var addMoreAgents = amountOfAgents > 0;
+            //further I need to work with positive numbers only
+            amountOfAgents = Math.Abs(amountOfAgents);
 
             if (amountOfAgents == 0)
             {
