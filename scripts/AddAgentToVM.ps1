@@ -53,7 +53,7 @@ $WebClient.DownloadFile($Uri, $agentZip);
 Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.ZipFile]::ExtractToDirectory($agentZip, "$PWD");
 
 #will default to directly attached disk, if data disk is not there
-$agentWorkFolder = "D:\w"
+$agentWorkFolder = "C:\w"
 
 if ($prepareDataDisks) {
     $disks = Get-Disk | Where-Object partitionstyle -eq 'raw' | Sort-Object number
