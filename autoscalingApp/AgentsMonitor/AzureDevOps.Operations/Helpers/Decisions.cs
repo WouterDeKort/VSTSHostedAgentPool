@@ -9,6 +9,13 @@ namespace AzureDevOps.Operations.Helpers
 {
     public static class Decisions
     {
+        /// <summary>
+        /// Decides how much agents must be added
+        /// </summary>
+        /// <param name="runningJobs">Amount of current jobs running</param>
+        /// <param name="agentsCount">Amount of online agents now</param>
+        /// <param name="maxAgents">Maximum accessible agents in current pool</param>
+        /// <returns></returns>
         public static int HowMuchAgents(int runningJobs, int agentsCount, int maxAgents)
         {
             if (agentsCount == maxAgents && runningJobs >= agentsCount)
@@ -28,7 +35,25 @@ namespace AzureDevOps.Operations.Helpers
                     return Properties.AmountOfAgents - agentsCount;
                 }
 
+                if (amountOfAgents < Properties.AmountOfAgents)
+                {
+                    //we need to deprovision agents in business time
+                    return amountOfAgents + Properties.AmountOfAgents;
+                }
             }
+
+            if (dynamicProperties.WeAreInsideBusinessTime && amountOfAgents > 0)
+            {
+                //we need to provision more agents
+                if (agentsCount < Properties.AmountOfAgents)
+                {
+                    //if we need to give more agents - we need to decide on amount to be given
+                    amountOfAgents = Properties.AmountOfAgents - agentsCount > amountOfAgents
+                        ? Properties.AmountOfAgents - agentsCount
+                        : amountOfAgents;
+                }
+            }
+
             return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 
