@@ -58,7 +58,14 @@ namespace AzureDevOps.Operations.Classes
             //I wish this record to be processed on it's own; it is just tracking
             RecordDataInTable(addMoreAgents, amountOfAgents);
 
-            WorkWithScaleSet(addMoreAgents, virtualMachines, currentJobs, vmss, amountOfAgents);
+            if (addMoreAgents)
+            {
+                AllocateVms(virtualMachines, amountOfAgents, vmss);
+            }
+            else
+            {
+                DeallocationWorkWithScaleSet(virtualMachines, currentJobs, vmss, amountOfAgents);
+            }           
         }
 
         private static AzureCredentials AzureCreds()
@@ -94,30 +101,23 @@ namespace AzureDevOps.Operations.Classes
         /// <summary>
         /// This method will perform all changes to scale set
         /// </summary>
-        private static void WorkWithScaleSet(bool addingMore,
+        private static void DeallocationWorkWithScaleSet(
             IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped,
             JobRequest[] executingJobs,
             IVirtualMachineScaleSet scaleSet, int agentsLimit)
         {
-            if (!addingMore)
-            {
-                Console.WriteLine("Deallocating VMs");
-                //we need to downscale, only running VMs shall be selected here
-                var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
-                DeallocateVms(instanceIdCollection, scaleSet);
+            Console.WriteLine("Deallocating VMs");
+            //we need to downscale, only running VMs shall be selected here
+            var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
+            DeallocateVms(instanceIdCollection, scaleSet);
 
-                //if we are deprovisioning - it is some time to do some housekeeping as well
-                if (Properties.IsDryRun)
-                {
-                    return;
-                }
-
-                HouseKeeping(scaleSet);
-            }
-            else
+            //if we are deprovisioning - it is some time to do some housekeeping as well
+            if (Properties.IsDryRun)
             {
-                AllocateVms(virtualMachinesStripped, agentsLimit, scaleSet);
+                return;
             }
+
+            HouseKeeping(scaleSet);
         }
 
         private static void DeallocateVms(IEnumerable<string> instanceIdCollection, IVirtualMachineScaleSet scaleSet)
