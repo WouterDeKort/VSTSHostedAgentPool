@@ -33,7 +33,7 @@ namespace AzureDevOps.Operations.Classes
                     VmInstanceId = vmssVm.InstanceId,
                     VmName = vmssVm.ComputerName,
                     VmInstanceState = vmssVm.PowerState
-                });
+                }).ToArray();
 
             //get jobs again to check, if we could deallocate a VM in VMSS
             //(if it is running a job - it is not wise to deallocate it)
@@ -105,7 +105,7 @@ namespace AzureDevOps.Operations.Classes
         /// This method will perform all changes to scale set
         /// </summary>
         private static void DeallocationWorkWithScaleSet(
-            IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped,
+            ScaleSetVirtualMachineStripped[] virtualMachinesStripped,
             JobRequest[] executingJobs,
             IVirtualMachineScaleSet scaleSet)
         {
@@ -156,12 +156,20 @@ namespace AzureDevOps.Operations.Classes
             }
         }
 
-        private static void AllocateVms(IEnumerable<ScaleSetVirtualMachineStripped> virtualMachinesStripped, int agentsLimit, IVirtualMachineScaleSet scaleSet)
+        private static void AllocateVms(ScaleSetVirtualMachineStripped[] virtualMachinesStripped, int agentsLimit, IVirtualMachineScaleSet scaleSet)
         {
-            var scaleSetVirtualMachineStripped = virtualMachinesStripped as ScaleSetVirtualMachineStripped[] ?? virtualMachinesStripped.ToArray();
-            var virtualMachinesCounter = scaleSetVirtualMachineStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Starting));
+            var virtualMachinesCounter = 0;
+            try
+            {
+                virtualMachinesCounter = virtualMachinesStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Starting));
+            }
+            catch
+            {
+                Console.WriteLine("Could not get VMs in starting state");
+            }
+
             Console.WriteLine("Starting more VMs");
-            foreach (var virtualMachineStripped in scaleSetVirtualMachineStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
+            foreach (var virtualMachineStripped in virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
             {
                 if (virtualMachinesCounter >= agentsLimit)
                 {
