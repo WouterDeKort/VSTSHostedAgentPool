@@ -33,5 +33,5 @@ ElseIf ($Action -eq "Stop") {
     Stop-AzureRmVmss -ResourceGroupName $ResourceGroup -VMScaleSetName $ScaleSet -Force
 }
 Else {
-    Write-Error "Unregonized action $Action"
+    Write-Error "Unrecognized action $Action"
 }
