@@ -6,8 +6,9 @@ Param(
 
 )
 
-$ResourceGroup = $resourcesBaseName + "-rg";
-$ScaleSet = $resourcesBaseName + "-vmss";
+Import-Module $PSScriptRoot\functions\helpers.psm1
+$ResourceGroup =  GenerateResourceGroupName -baseName $resourcesBaseName;
+$ScaleSet = GenerateVmssName -baseName $resourcesBaseName;
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

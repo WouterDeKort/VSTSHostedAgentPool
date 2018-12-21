@@ -32,7 +32,7 @@ Param(
 
 Import-Module $PSScriptRoot\functions\helpers.psm1
 #Construct resources names
-$AgentPoolResourceGroup = $resourcesBaseName + "-rg";
+$AgentPoolResourceGroup = GenerateResourceGroupName -baseName $resourcesBaseName;
 $subnetName = $resourcesBaseName + "-subnet";
 $vnetName = $resourcesBaseName + "-vnet";
 $pipName = $resourcesBaseName + "-pip";
@@ -41,7 +41,7 @@ if ([string]::IsNullOrWhiteSpace($pipRg)) {
     $pipRg = $AgentPoolResourceGroup;
 }
 $lbName = $resourcesBaseName + "-lb";
-$vmssScaleSetName = $resourcesBaseName + "-vmss";
+$vmssScaleSetName = GenerateVmssName -baseName $resourcesBaseName;
 
 if ([string]::IsNullOrWhiteSpace($allowedIps)) {
     #allowed IPs is not defined - so, we could not deploy an NSG

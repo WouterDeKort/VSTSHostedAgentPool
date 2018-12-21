@@ -23,3 +23,24 @@ function SetCustomTagOnResource {
         Write-Verbose "Ended tags settings"
     }
 }
+
+
+function GenerateResourceGroupName {
+    param (
+        $baseName
+    )
+
+    $generatedName = $baseName + "-rg";
+    Write-Verbose "GenerateResourceGroupName: resource group name is $generatedName";
+    return $generatedName;
+}
+
+function GenerateVmssName {
+    param (
+        $baseName
+    )
+
+    $generatedName = $baseName + "-vmss";
+    Write-Verbose "GenerateVmssName: VMSS name is $generatedName";
+    return $generatedName;
+}
