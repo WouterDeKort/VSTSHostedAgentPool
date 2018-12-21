@@ -164,9 +164,9 @@ namespace AzureDevOps.Operations.Classes
 
         private static void AllocateVms(ScaleSetVirtualMachineStripped[] virtualMachinesStripped, int agentsLimit, IVirtualMachineScaleSet scaleSet)
         {
-            //this counter is needed to not start extra agents; it could be that agent vm is started or even started already, but agent still have not been registered at the pool
-            var virtualMachinesCounter = virtualMachinesStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Starting)) 
-                                         + virtualMachinesStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Running));
+            //this counter is needed to not start extra agents, maybe VM is already starting
+            var virtualMachinesCounter =
+                virtualMachinesStripped.Count(vm => vm.VmInstanceState.Equals(PowerState.Starting));
 
             Console.WriteLine("Starting more VMs");
             foreach (var virtualMachineStripped in virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Deallocated)))
