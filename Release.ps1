@@ -17,7 +17,7 @@ Param(
     [string]$vmssSkuName = "Standard_D4s_v3",
     [string]$vstsPoolName = "Default",
     [string]$vstsAgentPackageUri = "https://vstsagentpackage.azureedge.net/agent/2.140.2/vsts-agent-win-x64-2.140.2.zip",
-    [string]$vmssDiskStorageAccount = "Premium_LRS",
+    [string]$vmssDiskStorageAccount = "StandardSSD_LRS",
     [int]$vmssDataDiskSize = 64,
     #by default we will attach a dataDisk
     [bool]$attachDataDisk = $true,
