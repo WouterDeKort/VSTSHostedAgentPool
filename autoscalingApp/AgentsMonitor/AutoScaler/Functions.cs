@@ -21,7 +21,7 @@ namespace AutoScaler
         /// </summary>
         /// <param name="timer"></param>
         [Singleton]
-        public static void ProvisionTrigger([TimerTrigger("0 */2 * * * *", RunOnStartup = true)]
+        public static void ProvisionTrigger([TimerTrigger("0 */3 * * * *", RunOnStartup = true)]
             TimerInfo timer)
         {
             Checker.AgentsQueue(true);
