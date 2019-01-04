@@ -111,8 +111,8 @@ namespace AzureDevOps.Operations.Classes
         {
             Console.WriteLine("Deallocating VMs");
             //we need to downscale, only running VMs shall be selected here
-            var instanceIdCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
-            DeallocateVms(instanceIdCollection, scaleSet, agentsLimit);
+            var vmInstancesCollection = Decisions.CollectInstanceIdsToDeallocate(virtualMachinesStripped.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)), executingJobs);
+            DeallocateVms(vmInstancesCollection, scaleSet, agentsLimit);
 
             //if we are deprovisioning - it is some time to do some housekeeping as well
             if (Properties.IsDryRun)
@@ -123,22 +123,30 @@ namespace AzureDevOps.Operations.Classes
             HouseKeeping(scaleSet);
         }
 
-        private static void DeallocateVms(IEnumerable<string> instanceIdCollection, IVirtualMachineScaleSet scaleSet, int agentsCountToDeallocate)
+        private static void DeallocateVms(IEnumerable<ScaleSetVirtualMachineStripped> vmInstances, IVirtualMachineScaleSet scaleSet, int agentsCountToDeallocate)
         {
             var virtualMachinesCounter = 0;
-            foreach (var instanceId in instanceIdCollection)
+            foreach (var vmInstance in vmInstances)
             {
                 if (virtualMachinesCounter >= agentsCountToDeallocate)
                 {
                     break;
                 }
-                Console.WriteLine($"Deallocating VM with instance ID {instanceId}");
-                if (!Properties.IsDryRun)
-                {
-                    scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(Properties.VmScaleSetResourceGroupName, Properties.VmScaleSetName,
-                        instanceId);
-                }
+                Console.WriteLine($"Deallocating VM with instance ID {vmInstance}");
                 virtualMachinesCounter++;
+                if (Properties.IsDryRun)
+                {
+                    continue;
+                }
+
+                if (Decisions.IsVmExecutingJob(vmInstance.VmName))
+                {
+                    //this VM just got job assigned, so we should not deallocate it
+                    continue;
+                }
+
+                scaleSet.VirtualMachines.Inner.BeginDeallocateWithHttpMessagesAsync(Properties.VmScaleSetResourceGroupName, Properties.VmScaleSetName,
+                    vmInstance.VmInstanceId);
             }
         }
 
