@@ -57,20 +57,22 @@ namespace AzureDevOps.Operations.Helpers
             return amountOfAgents > maxAgents ? Math.Abs(maxAgents - agentsCount) : amountOfAgents;
         }
 
-        public static string[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)
+        public static ScaleSetVirtualMachineStripped[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)
         {
-            var instanceIdList = new List<string>();
             var busyAgentsNames = jobRequests.Select(job => job.ReservedAgent.Name).ToArray();
 
-            foreach (var scaleSetVirtualMachineStripped in vmScaleSetStripped)
-            {
-                if (!busyAgentsNames.Contains(scaleSetVirtualMachineStripped.VmName))
-                {
-                    instanceIdList.Add(scaleSetVirtualMachineStripped.VmInstanceId);
-                }
-            }
+            return vmScaleSetStripped.Where(scaleSetVirtualMachineStripped => !busyAgentsNames.Contains(scaleSetVirtualMachineStripped.VmName)).ToArray();
+        }
 
-            return instanceIdList.ToArray();
+        /// <summary>
+        /// Checks if VM got job assigned during 
+        /// </summary>
+        /// <param name="vmName"></param>
+        /// <returns></returns>
+        public static bool IsVmExecutingJob(string vmName)
+        {
+            var currentJobs = Checker.DataRetriever.GetRuningJobs(Properties.AgentsPoolId);
+            return currentJobs.Select(job => job.ReservedAgent.Name).Contains(vmName);
         }
     }
 }

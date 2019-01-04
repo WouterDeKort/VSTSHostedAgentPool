@@ -135,7 +135,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var vmScaleSetData = GetTestData(10, testArray);
             var instanceIds = GetInstanceIds(vmScaleSetData);
             Assert.IsTrue(instanceIds.Length.Equals(10));
-            Assert.IsFalse(instanceIds[0].Equals(testValid.VmInstanceId));
+            Assert.IsFalse(instanceIds[0].VmInstanceId.Equals(testValid.VmInstanceId));
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
             var vmScaleSetData = GetTestData(10, testArray);
             var instanceIds = GetInstanceIds(vmScaleSetData, TestsConstants.TestPoolId, TestsConstants.Json3JobIsRunning);
             Assert.IsTrue(instanceIds.Length.Equals(10));
-            Assert.IsFalse(instanceIds[0].Equals(testArray[0].VmInstanceId));
+            Assert.IsFalse(instanceIds[0].VmInstanceId.Equals(testArray[0].VmInstanceId));
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace AzureDevOps.Operations.Tests.Helpers
             Assert.IsTrue(instanceIds.Length.Equals(0));
         }
 
-        private static string[] GetInstanceIds(IEnumerable<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
+        private static ScaleSetVirtualMachineStripped[] GetInstanceIds(IEnumerable<ScaleSetVirtualMachineStripped> vmScaleSetData, int poolId = TestsConstants.TestPoolId, string jsonData = TestsConstants.Json1JobIsRunning)
         {
             var dataRetriever = RetrieveTests.CreateRetriever(jsonData);
             return Decisions.CollectInstanceIdsToDeallocate(vmScaleSetData.Where(vm => vm.VmInstanceState.Equals(PowerState.Running)),
