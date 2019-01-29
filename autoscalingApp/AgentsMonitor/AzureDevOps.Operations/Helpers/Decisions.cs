@@ -59,7 +59,7 @@ namespace AzureDevOps.Operations.Helpers
 
         public static ScaleSetVirtualMachineStripped[] CollectInstanceIdsToDeallocate(IEnumerable<ScaleSetVirtualMachineStripped>vmScaleSetStripped, JobRequest[] jobRequests)
         {
-            var busyAgentsNames = jobRequests.Select(job => job.ReservedAgent.Name).ToArray();
+            var busyAgentsNames = jobRequests.Select(job => job.ReservedAgent?.Name).ToArray();
 
             return vmScaleSetStripped.Where(scaleSetVirtualMachineStripped => !busyAgentsNames.Contains(scaleSetVirtualMachineStripped.VmName)).ToArray();
         }
