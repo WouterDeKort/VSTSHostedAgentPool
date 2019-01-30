@@ -2,6 +2,10 @@
 
 This folder holds Azure Web App job for monitoring and autoscaling Azure Agents Virtual Machines Scale Set.
 
+# Known bugs
+
+1. Since VM deprovisioning in VMSS is not immediate process - when VM are already deprovisioning, agent service is still running and report to the queue as being online and could receive job to be performed. This job, sadly, will fail.
+
 ## Implementation
 
 Azure Web app job checks Azure DevOps account specified and monitors queue. As soon as there is waiting job - new VM in VMSS shall be started.
