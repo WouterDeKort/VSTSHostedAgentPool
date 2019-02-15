@@ -26,15 +26,20 @@ Param(
     #Provide an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0); or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24).
     [string]$allowedIps,
     #Provide a single port, such as 80; a port range, such as 1024-65535; or a comma-separated list of single ports and/or port ranges, such as 80,1024-65535. This specifies on which ports traffic will be allowed or denied by this rule. Provide an asterisk (*) to allow traffic on any port.
-    [string]$allowedPorts = "3389"
+    [string]$allowedPorts = "3389",
+    #defines, if we shall deploy to existing VNet or to provision new VNet
+    [bool]$deployToExistingVnet = $false,
+    #defining names for subnet and vnet
+    [string]$subnetName = $resourcesBaseName + "-subnet",
+    [string]$vnetName = $resourcesBaseName + "-vnet",
+    #VNet RG must be defined, as we are destroying RG with Agent each time
+    [string]$vnetResourceGroupName
 )
 
 
 Import-Module $PSScriptRoot\functions\helpers.psm1
 #Construct resources names
 $AgentPoolResourceGroup = GenerateResourceGroupName -baseName $resourcesBaseName;
-$subnetName = $resourcesBaseName + "-subnet";
-$vnetName = $resourcesBaseName + "-vnet";
 $pipName = $resourcesBaseName + "-pip";
 if ([string]::IsNullOrWhiteSpace($pipRg)) {
     #public IP resource group have not been specified -> deploying in renewable one
@@ -61,19 +66,24 @@ if (-Not $notPresent) {
 Write-Host "Creating new resource group $AgentPoolResourceGroup"
 New-AzureRmResourceGroup -Name $AgentPoolResourceGroup -Location $Location
 
-Write-Host "Create a virtual network subnet"
-$subnet = New-AzureRmVirtualNetworkSubnetConfig `
-    -Name $subnetName `
-    -AddressPrefix 10.0.0.0/24
-
-Write-Host "Create a virtual network"
-$vnet = New-AzureRmVirtualNetwork `
-    -ResourceGroupName $AgentPoolResourceGroup `
-    -Name $vnetName `
-    -Location $Location `
-    -AddressPrefix 10.0.0.0/16 `
-    -Subnet $subnet `
-    -Force
+if ($deployToExistingVnet -and (-not [string]::IsNullOrWhiteSpace($vnetResourceGroupName))) {
+    $vnet = Get-AzureRmVirtualNetwork -ResourceGroupName $vnetResourceGroupName -Name $vnetName;
+    $subnet = Get-AzureRmVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name $subnetName;
+} else {
+    Write-Host "Create a virtual network subnet"
+    $subnet = New-AzureRmVirtualNetworkSubnetConfig `
+        -Name $subnetName `
+        -AddressPrefix 10.0.0.0/24
+    
+    Write-Host "Create a virtual network"
+    $vnet = New-AzureRmVirtualNetwork `
+        -ResourceGroupName $AgentPoolResourceGroup `
+        -Name $vnetName `
+        -Location $Location `
+        -AddressPrefix 10.0.0.0/16 `
+        -Subnet $subnet `
+        -Force    
+}
 
 Get-AzureRmPublicIpAddress -Name $pipName -ResourceGroupName $pipRg -ev pipNotPresent -ea 0;
 if ($pipNotPresent){
@@ -140,7 +150,7 @@ $ipConfig = New-AzureRmVmssIpConfig `
     -Name "IPConfig" `
     -LoadBalancerBackendAddressPoolsId $lb.BackendAddressPools[0].Id `
     -LoadBalancerInboundNatPoolsId $inboundNATPool.Id `
-    -SubnetId $vnet.Subnets[0].Id
+    -SubnetId $subnet.Id
 
 Write-Host "Create a config object"
 $vmssConfig = New-AzureRmVmssConfig `
@@ -293,6 +303,10 @@ if ($attachNsg) {
     SetCustomTagOnResource -resourceId $nsg.Id -resourceName $nsgName;
 }
 SetCustomTagOnResource -resourceId $storage.Id -resourceName $StorageAccountName;
-SetCustomTagOnResource -resourceId $vnet.Id -resourceName $vnetName;
+if (-not $deployToExistingVnet) {
+    #we shall set custom tags on vnet only in case we are deploying it ourselves
+    SetCustomTagOnResource -resourceId $vnet.Id -resourceName $vnetName;
+}
+
 
 Write-Host "Finished creating VM Scale Set and installing Agent"
